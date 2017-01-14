@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">namofo</string>
+    <string name="app_name">namofo_radio</string>
+
+    <string name="tab_radio">直播</string>
+    <string name="tab_record">录音</string>
+    <string name="tab_download">下载管理</string>
+    <string name="tab_user_center">我的</string>
 </resources>

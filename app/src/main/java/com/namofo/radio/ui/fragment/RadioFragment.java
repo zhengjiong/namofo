@@ -11,9 +11,7 @@ import com.namofo.radio.R;
 import com.namofo.radio.base.BaseFragment;
 
 /**
- * Title: RadioFragment
  * Description: 直播
- * Copyright:Copyright(c)2016
  * CreateTime:17/1/14  16:21
  *
  * @author 郑炯
@@ -21,10 +19,11 @@ import com.namofo.radio.base.BaseFragment;
  */
 public class RadioFragment extends BaseFragment {
     private Toolbar mToolbar;
+
     public static RadioFragment newInstance() {
-        
+
         Bundle args = new Bundle();
-        
+
         RadioFragment fragment = new RadioFragment();
         fragment.setArguments(args);
         return fragment;
@@ -42,5 +41,4 @@ public class RadioFragment extends BaseFragment {
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mToolbar.setTitle(R.string.tab_radio);
     }
-
 }

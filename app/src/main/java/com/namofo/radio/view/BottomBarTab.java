@@ -1,4 +1,4 @@
-package com.namofo.radio.ui.view;
+package com.namofo.radio.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

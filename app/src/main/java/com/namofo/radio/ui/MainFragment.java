@@ -14,8 +14,8 @@ import com.namofo.radio.ui.fragment.DownloadFragment;
 import com.namofo.radio.ui.fragment.RadioFragment;
 import com.namofo.radio.ui.fragment.RecordFragment;
 import com.namofo.radio.ui.fragment.UserCenterFragment;
-import com.namofo.radio.ui.view.BottomBar;
-import com.namofo.radio.ui.view.BottomBarTab;
+import com.namofo.radio.view.BottomBar;
+import com.namofo.radio.view.BottomBarTab;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

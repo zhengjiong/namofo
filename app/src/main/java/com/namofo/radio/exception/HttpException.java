@@ -1,7 +1,7 @@
 package com.namofo.radio.exception;
 
 /**
- * Title: HttpTimeException
+ * Title: HttpException
  * Description:
  * Copyright:Copyright(c)2016
  * Company: 博智维讯信息技术有限公司
@@ -10,14 +10,14 @@ package com.namofo.radio.exception;
  * @author 郑炯
  * @version 1.0
  */
-public class HttpTimeException extends RuntimeException{
+public class HttpException extends RuntimeException{
     public static final int NO_DATA = 0x2;
 
-    public HttpTimeException(int resultCode) {
+    public HttpException(int resultCode) {
         this(getApiExceptionMessage(resultCode));
     }
 
-    public HttpTimeException(String message) {
+    public HttpException(String message) {
         super(message);
     }
 

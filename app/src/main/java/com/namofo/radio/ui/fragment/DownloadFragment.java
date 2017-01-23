@@ -9,14 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chanven.lib.cptr.PtrDefaultHandler;
+import com.chanven.lib.cptr.PtrFrameLayout;
+import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
 import com.namofo.radio.adapter.MeiZhiAdapter;
 import com.namofo.radio.base.BaseFragment;
-import com.namofo.radio.entity.MeiZhi;
-import com.namofo.radio.presenter.meizhi.MeiZhiPresenter;
-import com.namofo.radio.view.MeiZhiView;
-
-import java.util.List;
+import com.namofo.radio.presenter.MeiZhiPresenter;
+import com.namofo.radio.util.ToastUtils;
+import com.namofo.radio.view.CustomPtrFrameLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,16 +29,20 @@ import butterknife.ButterKnife;
  * @author 郑炯
  * @version 1.0
  */
-public class DownloadFragment extends BaseFragment implements MeiZhiView {
+public class DownloadFragment extends BaseFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.recyclerview)
-    RecyclerView mRecyclerview;
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.ptr_layout)
+    CustomPtrFrameLayout mPtrFrameLayout;
 
     private MeiZhiPresenter mPresenter;
 
     private MeiZhiAdapter mAdapter;
+    private RecyclerAdapterWithHF mPtrAdapter;
 
     public static DownloadFragment newInstance() {
 
@@ -59,54 +64,57 @@ public class DownloadFragment extends BaseFragment implements MeiZhiView {
 
     private void initView(View view) {
         mToolbar.setTitle(R.string.tab_download);
-        mRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerview.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
+
+        mPtrFrameLayout.setPtrHandler(new PtrDefaultHandler() {
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                refresh();
+            }
+        });
+        mPtrFrameLayout.setAutoLoadMoreEnable(true);
+        mPtrFrameLayout.setOnLoadMoreListener(DownloadFragment.this::loadMore);
+    }
+
+    private void loadMore() {
+        mPresenter.loadMore(meiZhis -> {
+            mAdapter.addData(meiZhis);
+            mPtrFrameLayout.loadMoreComplete(meiZhis.size() != 0);
+        }, s -> {
+            ToastUtils.showShort(getContext(), s);
+            mPtrFrameLayout.loadMoreComplete(false);
+        });
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter = new MeiZhiPresenter(this);
 
-
+        mPresenter = new MeiZhiPresenter();
         mAdapter = new MeiZhiAdapter();
-        mRecyclerview.setAdapter(mAdapter);
+        mPtrAdapter = new RecyclerAdapterWithHF(mAdapter);
+        mRecyclerView.setAdapter(mPtrAdapter);
     }
 
     @Override
     public void onLazyInitView(@Nullable Bundle savedInstanceState) {
         super.onLazyInitView(savedInstanceState);
-        mPresenter.refresh();
+        mPtrFrameLayout.postDelayed(() -> {
+            mPtrFrameLayout.autoRefresh(true);
+        }, 100);
     }
 
-    @Override
-    public void showProgress() {
-
+    private void refresh() {
+        mPresenter.refresh(meiZhis -> {
+            mAdapter.setData(meiZhis);
+            mPtrFrameLayout.refreshComplete();
+            mPtrFrameLayout.setLoadMoreEnable(meiZhis.size() != 0);
+        }, s -> {
+            ToastUtils.showShort(getContext(), s);
+            mPtrFrameLayout.refreshComplete();
+            mPtrFrameLayout.setLoadMoreEnable(false);
+        });
     }
 
-    @Override
-    public void loadFailure() {
-
-    }
-
-    @Override
-    public void loadComplete() {
-
-    }
-
-    @Override
-    public void addData(List<MeiZhi> list) {
-        mAdapter.setData(list);
-    }
-
-    @Override
-    public void loadMore(List<MeiZhi> list) {
-        mAdapter.addData(list);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mPresenter.detachView();
-    }
 }

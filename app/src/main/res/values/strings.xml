@@ -5,4 +5,19 @@
     <string name="tab_record">录音</string>
     <string name="tab_download">下载管理</string>
     <string name="tab_user_center">我的</string>
+
+
+    <string name="btn_start">开始</string>
+    <string name="btn_pause">暂停</string>
+    <string name="btn_resume">继续</string>
+    <string name="btn_stop">停止</string>
+
+    <string name="confirm">确定</string>
+    <string name="re_connect">正在重连...</string>
+
+    <string name="error_invalid_url">播放地址错误!</string>
+    <string name="error_404_url">播放地址没有找到(404)!</string>
+    <string name="error_connect_refused">播放地址连接被拒绝!</string>
+    <string name="error_connection_timeout">播放地址连接超时!</string>
+    <string name="error_code_io_error">播放地址连接失败!</string>
 </resources>

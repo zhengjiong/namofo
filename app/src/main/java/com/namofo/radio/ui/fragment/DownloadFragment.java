@@ -1,23 +1,23 @@
 package com.namofo.radio.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.chanven.lib.cptr.PtrDefaultHandler;
-import com.chanven.lib.cptr.PtrFrameLayout;
-import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
-import com.namofo.radio.adapter.MeiZhiAdapter;
 import com.namofo.radio.base.BaseFragment;
-import com.namofo.radio.presenter.MeiZhiPresenter;
-import com.namofo.radio.util.ToastUtils;
-import com.namofo.radio.view.CustomPtrFrameLayout;
+import com.namofo.radio.base.FragmentAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,17 +32,17 @@ import butterknife.ButterKnife;
 public class DownloadFragment extends BaseFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.appbar)
+    AppBarLayout appbar;
+    @BindView(R.id.tab)
+    TabLayout tabLayout;
+    @BindView(R.id.viewpager)
+    ViewPager viewpager;
 
-    @BindView(R.id.recyclerview)
-    RecyclerView mRecyclerView;
-
-    @BindView(R.id.ptr_layout)
-    CustomPtrFrameLayout mPtrFrameLayout;
-
-    private MeiZhiPresenter mPresenter;
-
-    private MeiZhiAdapter mAdapter;
-    private RecyclerAdapterWithHF mPtrAdapter;
+    private FragmentAdapter mFragmentAdapter;
+    @NonNull
+    private List<String> mTitles = new ArrayList<>();
+    private List<Fragment> mFragments = new ArrayList<>();
 
     public static DownloadFragment newInstance() {
 
@@ -58,63 +58,26 @@ public class DownloadFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_download_layout, container, false);
         ButterKnife.bind(this, view);
-        initView(view);
+        init();
         return view;
     }
 
-    private void initView(View view) {
+    private void init() {
         mToolbar.setTitle(R.string.tab_download);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setHasFixedSize(true);
 
-        mPtrFrameLayout.setPtrHandler(new PtrDefaultHandler() {
-            @Override
-            public void onRefreshBegin(PtrFrameLayout frame) {
-                refresh();
-            }
-        });
-        mPtrFrameLayout.setAutoLoadMoreEnable(true);
-        mPtrFrameLayout.setOnLoadMoreListener(DownloadFragment.this::loadMore);
+        mTitles.add(getString(R.string.has_download));
+        mTitles.add(getString(R.string.undownload));
+
+        mFragments.add(DownloadedFragment.newInstance());
+        mFragments.add(UnDownloadFragment.newInstance());
+
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+
+        mFragmentAdapter = new FragmentAdapter(getChildFragmentManager(), mFragments, mTitles);
+        viewpager.setAdapter(mFragmentAdapter);
+        viewpager.setOffscreenPageLimit(mFragments.size());
+        tabLayout.setupWithViewPager(viewpager);
     }
 
-    private void loadMore() {
-        mPresenter.loadMore(meiZhis -> {
-            mAdapter.addData(meiZhis);
-            mPtrFrameLayout.loadMoreComplete(meiZhis.size() != 0);
-        }, s -> {
-            ToastUtils.showShort(getContext(), s);
-            mPtrFrameLayout.loadMoreComplete(false);
-        });
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mPresenter = new MeiZhiPresenter();
-        mAdapter = new MeiZhiAdapter();
-        mPtrAdapter = new RecyclerAdapterWithHF(mAdapter);
-        mRecyclerView.setAdapter(mPtrAdapter);
-    }
-
-    @Override
-    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
-        super.onLazyInitView(savedInstanceState);
-        mPtrFrameLayout.postDelayed(() -> {
-            mPtrFrameLayout.autoRefresh(true);
-        }, 100);
-    }
-
-    private void refresh() {
-        mPresenter.refresh(meiZhis -> {
-            mAdapter.setData(meiZhis);
-            mPtrFrameLayout.refreshComplete();
-            mPtrFrameLayout.setLoadMoreEnable(meiZhis.size() != 0);
-        }, s -> {
-            ToastUtils.showShort(getContext(), s);
-            mPtrFrameLayout.refreshComplete();
-            mPtrFrameLayout.setLoadMoreEnable(false);
-        });
-    }
 
 }

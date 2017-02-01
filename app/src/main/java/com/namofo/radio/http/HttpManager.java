@@ -77,11 +77,11 @@ public class HttpManager {
     /*结果判断*/
         //.map(basePostEntity);
         return (Observable) httpObservable
-                    /*失败后的retry配置*/
+                /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
-                   /*生命周期管理*/
+                /*生命周期管理*/
                 //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
-                   /*http请求线程*/
+                /*http请求线程*/
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                    /*回调线程*/

@@ -12,12 +12,30 @@
     <string name="btn_resume">继续</string>
     <string name="btn_stop">停止</string>
 
+    <string name="paused">已暂停</string>
+    <string name="stopped">已停止</string>
+
+
+
     <string name="confirm">确定</string>
     <string name="re_connect">正在重连...</string>
+    <string name="connectting">正在连接...</string>
+    <string name="playing">正在播放</string>
 
-    <string name="error_invalid_url">播放地址错误!</string>
-    <string name="error_404_url">播放地址没有找到(404)!</string>
-    <string name="error_connect_refused">播放地址连接被拒绝!</string>
+    <string name="has_download">已下载</string>
+    <string name="undownload">未下载</string>
+
+    <string name="error_invalid_url">无效的播放地址!</string>
+    <string name="error_404_url">播放资源不存在(404)!</string>
+    <string name="error_connect_refused">服务器拒绝连接!</string>
     <string name="error_connection_timeout">播放地址连接超时!</string>
-    <string name="error_code_io_error">播放地址连接失败!</string>
+    <string name="error_code_io">播放地址连接失败!</string>
+    <string name="error_empty_playlist">空的播放列表!</string>
+    <string name="error_stream_disconnected">与直播服务器连接断开!</string>
+    <string name="error_network">网络异常!</string>
+    <string name="error_unauthorized">未授权，播放一个禁播的流!</string>
+    <string name="error_prepare_timeout">播放器准备超时</string>
+    <string name="error_read_frame_timeout">读取数据超时</string>
+    <string name="error_unknow">未知错误</string>
+    <string name="error_media_info_switching_sw_decode">硬解失败，自动切换软解</string>
 </resources>

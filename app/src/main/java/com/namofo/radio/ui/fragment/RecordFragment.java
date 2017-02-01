@@ -1,38 +1,30 @@
 package com.namofo.radio.ui.fragment;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chanven.lib.cptr.PtrDefaultHandler;
+import com.chanven.lib.cptr.PtrFrameLayout;
+import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
+import com.namofo.radio.adapter.MeiZhiAdapter;
 import com.namofo.radio.base.BaseFragment;
-import com.namofo.radio.entity.MeiZhi;
-import com.namofo.radio.entity.api.BaseResultEntity;
-import com.namofo.radio.http.HttpService;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.namofo.radio.presenter.MeiZhiPresenter;
+import com.namofo.radio.util.ToastUtils;
+import com.namofo.radio.view.CustomPtrFrameLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Title: RadioFragment
- * Description: 直播
+ * Description: 录音
  * Copyright:Copyright(c)2016
  * CreateTime:17/1/14  16:21
  *
@@ -43,9 +35,15 @@ public class RecordFragment extends BaseFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recyclerview)
-    RecyclerView mRecyclerview;
-    @BindView(R.id.refresh_layout)
-    SwipeRefreshLayout mRefreshLayout;
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.ptr_layout)
+    CustomPtrFrameLayout mPtrFrameLayout;
+
+    private MeiZhiPresenter mPresenter;
+
+    private MeiZhiAdapter mAdapter;
+    private RecyclerAdapterWithHF mPtrAdapter;
 
     public static RecordFragment newInstance() {
 
@@ -73,6 +71,10 @@ public class RecordFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mPresenter = new MeiZhiPresenter();
+        mAdapter = new MeiZhiAdapter();
+        mPtrAdapter = new RecyclerAdapterWithHF(mAdapter);
+        mRecyclerView.setAdapter(mPtrAdapter);
         /*OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS);
@@ -118,7 +120,49 @@ public class RecordFragment extends BaseFragment {
 
     }
 
+    @Override
+    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
+        super.onLazyInitView(savedInstanceState);
+        mPtrFrameLayout.postDelayed(() -> {
+            mPtrFrameLayout.autoRefresh(true);
+        }, 100);
+    }
+
+    private void refresh() {
+        mPresenter.refresh(meiZhis -> {
+            mAdapter.setData(meiZhis);
+            mPtrFrameLayout.refreshComplete();
+            mPtrFrameLayout.setLoadMoreEnable(meiZhis.size() != 0);
+        }, s -> {
+            ToastUtils.showShort(getContext(), s);
+            mPtrFrameLayout.refreshComplete();
+            mPtrFrameLayout.setLoadMoreEnable(false);
+        });
+    }
+
+
     private void initView(View view) {
         mToolbar.setTitle(R.string.tab_record);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
+
+        mPtrFrameLayout.setPtrHandler(new PtrDefaultHandler() {
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                refresh();
+            }
+        });
+        mPtrFrameLayout.setAutoLoadMoreEnable(true);
+        mPtrFrameLayout.setOnLoadMoreListener(RecordFragment.this::loadMore);
+    }
+
+    private void loadMore() {
+        mPresenter.loadMore(meiZhis -> {
+            mAdapter.addData(meiZhis);
+            mPtrFrameLayout.loadMoreComplete(meiZhis.size() != 0);
+        }, s -> {
+            ToastUtils.showShort(getContext(), s);
+            mPtrFrameLayout.loadMoreComplete(false);
+        });
     }
 }

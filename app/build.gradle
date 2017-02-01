@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
@@ -10,7 +11,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
     buildTypes {
         release {
@@ -28,6 +29,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+}
+
+//greendao配置
+greendao {
+    schemaVersion 1                             //版本号，升级时可配置
+    daoPackage 'com.namofo.radio.db.greendao3'  //包名
+    targetGenDir 'src/main/java'                 //生成目录
 }
 
 dependencies {
@@ -68,4 +76,6 @@ dependencies {
     compile 'com.chanven.lib:cptr:1.1.0' //https://github.com/Chanven/CommonPullToRefresh
 
     compile 'com.qiniu.pili:pili-android-qos:0.8.+'
+
+    compile 'org.greenrobot:greendao:3.2.0'
 }

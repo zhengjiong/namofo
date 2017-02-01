@@ -7,22 +7,21 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.namofo.radio.R;
 import com.namofo.radio.base.BaseFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
+import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.util.Utils;
-import com.orhanobut.logger.Logger;
 import com.pili.pldroid.player.AVOptions;
 import com.pili.pldroid.player.PLMediaPlayer;
 
@@ -41,26 +40,30 @@ import butterknife.ButterKnife;
  */
 public class RadioFragment extends BaseFragment {
     private static final int MESSAGE_ID_RECONNECTING = 0x1;
-    //public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
-    public static final String RTMP = "http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8";
+//    public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
+//    public static final String RTMP = "http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8";
+
+    public static final String RTMP = "rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583";
+    public static final int RE_CONNECT_DELAY_MILLIS = 3000;
+    //public static final String RTMP = "http://26795.hlsplay.aodianyun.com/qingxinrensheng/stream.m3u8";
+
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.btn_start)
     Button btnStart;
-    @BindView(R.id.btn_pause)
-    Button btnPause;
-    @BindView(R.id.btn_resume)
-    Button btnResume;
     @BindView(R.id.btn_stop)
     Button btnStop;
     @BindView(R.id.loading_view)
     View loadView;
+    @BindView(R.id.txt_playing)
+    TextView txtPlaying;
 
     private PLMediaPlayer mPLMediaPlayer;
     private AVOptions mAVOptions;
     private boolean mIsStopped = false;
     private boolean mIsActivityPaused = true;
+    private boolean mIsPrepared;
 
     public static RadioFragment newInstance() {
 
@@ -87,19 +90,25 @@ public class RadioFragment extends BaseFragment {
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)//两秒钟之内只取一个点击事件，防抖操作
                 .subscribe(aVoid -> {
                     if (mIsStopped) {
+                        LogUtils.sout("mIsStopped = true");
                         prepare();
                     } else {
-                        mPLMediaPlayer.start();
+                        if (mIsPrepared) {
+                            LogUtils.sout("mIsPrepared = true");
+                            mPLMediaPlayer.start();
+                        }
                     }
+                    txtPlaying.setText(R.string.playing);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
-        RxView.clicks(btnPause)
+       /* RxView.clicks(btnPause)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)
                 .subscribe(aVoid -> {
                     if (mPLMediaPlayer != null) {
                         mPLMediaPlayer.pause();
                     }
+                    txtPlaying.setText(R.string.paused);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -109,9 +118,10 @@ public class RadioFragment extends BaseFragment {
                     if (mPLMediaPlayer != null) {
                         mPLMediaPlayer.start();
                     }
+                    txtPlaying.setText(R.string.playing);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
-                });
+                });*/
         RxView.clicks(btnStop)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)
                 .subscribe(aVoid -> {
@@ -121,6 +131,10 @@ public class RadioFragment extends BaseFragment {
                     }
                     mIsStopped = true;
                     mPLMediaPlayer = null;
+                    loadView.setVisibility(View.GONE);
+                    txtPlaying.setVisibility(View.VISIBLE);
+                    txtPlaying.setText(R.string.stopped);
+                    mHandler.removeCallbacksAndMessages(null);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -180,6 +194,7 @@ public class RadioFragment extends BaseFragment {
     }
 
     private void prepare() {
+        LogUtils.sout("prepare");
         if (mPLMediaPlayer == null) {
             mPLMediaPlayer = new PLMediaPlayer(getContext(), mAVOptions);
             mPLMediaPlayer.setOnPreparedListener(mOnPreparedListener);
@@ -213,8 +228,9 @@ public class RadioFragment extends BaseFragment {
     private PLMediaPlayer.OnPreparedListener mOnPreparedListener = new PLMediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(PLMediaPlayer mp) {
-            Logger.i("onPrepared isPlaying=" + mp.isPlaying());
-            mPLMediaPlayer.start(); //会自动播放可以不用加
+            LogUtils.sout("mOnPreparedListener onPrepared isPlaying=" + mp.isPlaying());
+            mIsPrepared = true;
+            mPLMediaPlayer.start(); //如果是自动播放可以不用加
             mIsStopped = false;
 
             /**
@@ -228,22 +244,43 @@ public class RadioFragment extends BaseFragment {
     private PLMediaPlayer.OnCompletionListener mOnCompletionListener = new PLMediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(PLMediaPlayer mp) {
-            Logger.i("播放完成");
+            LogUtils.sout("mOnCompletionListener onCompletion(播放完成)");
+            release();
+            sendReconnectMessage();
         }
     };
 
     private PLMediaPlayer.OnInfoListener mOnInfoListener = new PLMediaPlayer.OnInfoListener() {
         @Override
         public boolean onInfo(PLMediaPlayer mp, int what, int extra) {
-            Logger.i("OnInfo, what = " + what + ", extra = " + extra);
+            /*
+            what 定义了消息类型，extra 是附加参数
+
+            what	value	描述
+            MEDIA_INFO_UNKNOWN	1	未知消息
+            MEDIA_INFO_VIDEO_RENDERING_START	3	第一帧视频已成功渲染
+            MEDIA_INFO_BUFFERING_START	701	开始缓冲
+            MEDIA_INFO_BUFFERING_END	702	停止缓冲
+            MEDIA_INFO_VIDEO_ROTATION_CHANGED	10001	获取到视频的播放角度
+            MEDIA_INFO_AUDIO_RENDERING_START	10002	第一帧音频已成功播放
+            MEDIA_INFO_SWITCHING_SW_DECODE	802	硬解失败，自动切换软解
+            该对象用于监听播放器的状态消息，在播放器启动后，SDK 会在播放器发生状态变化时调用该对象的 onInfo 方法，同步状态信息。
+            */
+
+//            Logger.i("OnInfo, what = " + what + ", extra = " + extra);
+            LogUtils.sout("mOnInfoListener what = " + what + ", extra = " + extra);
             switch (what) {
                 case PLMediaPlayer.MEDIA_INFO_BUFFERING_START:
                     loadView.setVisibility(View.VISIBLE);
+                    txtPlaying.setVisibility(View.GONE);
                     break;
                 case PLMediaPlayer.MEDIA_INFO_BUFFERING_END:
                 case PLMediaPlayer.MEDIA_INFO_AUDIO_RENDERING_START:
-                    loadView.setVisibility(View.INVISIBLE);
+                    loadView.setVisibility(View.GONE);
+                    txtPlaying.setVisibility(View.VISIBLE);
                     break;
+                case PLMediaPlayer.MEDIA_INFO_SWITCHING_SW_DECODE:
+                    ToastUtils.showShort(getContext(), R.string.error_media_info_switching_sw_decode);
                 default:
                     break;
             }
@@ -258,11 +295,25 @@ public class RadioFragment extends BaseFragment {
         }
     };*/
 
+    /*
+    MEDIA_ERROR_UNKNOWN	-1	未知错误
+    ERROR_CODE_INVALID_URI	-2	无效的 URL
+    ERROR_CODE_IO_ERROR	-5	网络异常
+    ERROR_CODE_STREAM_DISCONNECTED	-11	与服务器连接断开
+    ERROR_CODE_EMPTY_PLAYLIST	-541478725	空的播放列表
+    ERROR_CODE_404_NOT_FOUND	-875574520	播放资源不存在
+    ERROR_CODE_CONNECTION_REFUSED	-111	服务器拒绝连接
+    ERROR_CODE_CONNECTION_TIMEOUT	-110	连接超时
+    ERROR_CODE_UNAUTHORIZED	-825242872	未授权，播放一个禁播的流
+    ERROR_CODE_PREPARE_TIMEOUT	-2001	播放器准备超时
+    ERROR_CODE_READ_FRAME_TIMEOUT	-2002	读取数据超时
+    ERROR_CODE_HW_DECODE_FAILURE	-2003	硬解码失败
+    */
     private PLMediaPlayer.OnErrorListener mOnErrorListener = new PLMediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(PLMediaPlayer mp, int errorCode) {
             boolean isNeedReconnect = false;
-            Logger.i("Error happened, errorCode = " + errorCode);
+            LogUtils.sout("mOnErrorListener onError errorCode = " + errorCode);
             switch (errorCode) {
                 case PLMediaPlayer.ERROR_CODE_INVALID_URI:
                     showToast(R.string.error_invalid_url);
@@ -280,35 +331,37 @@ public class RadioFragment extends BaseFragment {
                     isNeedReconnect = true;
                     break;
                 case PLMediaPlayer.ERROR_CODE_EMPTY_PLAYLIST:
-                    showToast("Empty playlist !");
+                    showToast(R.string.error_empty_playlist);
                     break;
                 case PLMediaPlayer.ERROR_CODE_STREAM_DISCONNECTED:
-                    showToast("Stream disconnected !");
+                    showToast(R.string.error_stream_disconnected);
                     isNeedReconnect = true;
                     break;
                 case PLMediaPlayer.ERROR_CODE_IO_ERROR:
                     //showToastTips("Network IO Error !");
-                    showToast(R.string.error_code_io_error);
+                    showToast(R.string.error_network);
                     isNeedReconnect = true;
                     break;
                 case PLMediaPlayer.ERROR_CODE_UNAUTHORIZED:
-                    showToast("Unauthorized Error !");
+                    showToast(R.string.error_unauthorized);
                     break;
                 case PLMediaPlayer.ERROR_CODE_PREPARE_TIMEOUT:
-                    showToast("Prepare timeout !");
+                    showToast(R.string.error_prepare_timeout);
                     isNeedReconnect = true;
                     break;
                 case PLMediaPlayer.ERROR_CODE_READ_FRAME_TIMEOUT:
-                    showToast("Read frame timeout !");
+                    showToast(R.string.error_read_frame_timeout);
                     isNeedReconnect = true;
                     break;
                 case PLMediaPlayer.MEDIA_ERROR_UNKNOWN:
+                    showToast(R.string.error_unknow);
                     break;
                 default:
-                    showToast("未知错误");
+                    showToast(R.string.error_unknow);
                     break;
             }
             // Todo pls handle the error status here, reconnect or call finish()
+            isNeedReconnect = true;//设置可以重连
             release();
             if (isNeedReconnect) {
                 sendReconnectMessage();
@@ -322,10 +375,11 @@ public class RadioFragment extends BaseFragment {
     };
 
     private void sendReconnectMessage() {
-        ToastUtils.showShort(getContext(), R.string.re_connect);
+        //ToastUtils.showShort(getContext(), R.string.re_connect);
         loadView.setVisibility(View.VISIBLE);
+        txtPlaying.setVisibility(View.GONE);
         mHandler.removeCallbacksAndMessages(null);
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_ID_RECONNECTING), 500);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_ID_RECONNECTING), RE_CONNECT_DELAY_MILLIS);
     }
 
     protected Handler mHandler = new Handler(Looper.getMainLooper()) {
@@ -338,6 +392,7 @@ public class RadioFragment extends BaseFragment {
                 return;
             }*/
             if (!Utils.isNetworkAvailable(getContext())) {
+                LogUtils.sout("mHandler 网络不可用 sendReconnectMessage");
                 sendReconnectMessage();
                 return;
             }

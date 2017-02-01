@@ -33,7 +33,7 @@ public class UserCenterFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tab_radio_layout, container, false);
+        View view = inflater.inflate(R.layout.fragment_tab_user_layout, container, false);
         initView(view);
         return view;
     }

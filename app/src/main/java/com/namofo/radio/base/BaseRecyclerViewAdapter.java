@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.namofo.radio.base.BaseViewHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 

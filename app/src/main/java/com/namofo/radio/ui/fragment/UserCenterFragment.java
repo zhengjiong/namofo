@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
-import com.namofo.radio.base.BaseFragment;
+import com.namofo.radio.ui.base.BaseFragment;
 
 /**
  * Title: UserCenterFragment

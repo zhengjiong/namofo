@@ -8,14 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
-import com.namofo.radio.base.BaseFragment;
+import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Titale: DownloadedFragment
+ * Title: DownloadedFragment
  * CreateTime:17/1/25  09:51
  *
  * @author 郑炯

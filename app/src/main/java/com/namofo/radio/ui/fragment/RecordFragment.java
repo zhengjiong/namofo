@@ -14,7 +14,7 @@ import com.chanven.lib.cptr.PtrFrameLayout;
 import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
 import com.namofo.radio.adapter.MeiZhiAdapter;
-import com.namofo.radio.base.BaseFragment;
+import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.presenter.MeiZhiPresenter;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;

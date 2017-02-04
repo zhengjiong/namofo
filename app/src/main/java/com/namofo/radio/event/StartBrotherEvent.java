@@ -1,8 +1,6 @@
 package com.namofo.radio.event;
 
-import com.namofo.radio.base.BaseFragment;
-
-import me.yokeyword.fragmentation.SupportFragment;
+import com.namofo.radio.ui.base.BaseFragment;
 
 /**
  * Created by YoKeyword on 16/6/30.

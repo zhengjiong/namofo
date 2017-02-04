@@ -1,4 +1,4 @@
-package com.namofo.radio.base;
+package com.namofo.radio.ui.base;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;

@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.namofo.radio.R;
-import com.namofo.radio.base.BaseActivity;
+import com.namofo.radio.ui.base.BaseActivity;
 
 import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.helper.FragmentLifecycleCallbacks;

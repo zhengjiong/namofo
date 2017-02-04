@@ -44,6 +44,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
     compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:palette-v7:25.1.0'
+    compile 'com.android.support:mediarouter-v7:25.1.0'
     compile 'me.yokeyword:fragmentation:0.9.4'
     //compile 'io.reactivex:rxandroid:1.2.1'
     //compile "io.reactivex.rxjava2:rxjava:2.0.4"
@@ -77,5 +79,20 @@ dependencies {
 
     compile 'com.qiniu.pili:pili-android-qos:0.8.+'
 
+    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
+    //# required, enough for most devices.
+    //compile 'tv.danmaku.ijk.media:ijkplayer-java:0.4.5.1'
+    //compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.4.5.1'
+
+    //# Other ABIs: optional
+    //compile 'tv.danmaku.ijk.media:ijkplayer-armv5:0.4.5.1'
+    //compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.4.5.1'
+    //compile 'tv.danmaku.ijk.media:ijkplayer-x86:0.4.5.1'
+
+    //# ExoPlayer as IMediaPlayer: optional, experimental
+    //compile 'tv.danmaku.ijk.media:ijkplayer-exo:0.4.5.1'
+
     compile 'org.greenrobot:greendao:3.2.0'
+
+    //compile 'com.github.daniel-stoneuk:material-about-library:1.5.0'//https://github.com/daniel-stoneuk/material-about-library
 }

@@ -1,4 +1,4 @@
-package com.namofo.radio.base;
+package com.namofo.radio;
 
 import android.app.Application;
 

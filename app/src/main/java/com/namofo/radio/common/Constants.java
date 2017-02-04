@@ -14,4 +14,6 @@ public class Constants {
     public static final String BASE_URL = "http://gank.io/api/";
 
     public static final int TIMEOUT = 15;
+
+    public static final String NOTIFICATION_GROUP_NAME = "namofo_radio";
 }

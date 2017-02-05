@@ -29,7 +29,7 @@
         <activity android:name=".ui.TestActivity"/>
 
         <service
-            android:name=".service.RadioService"/>
+            android:name=".service.PlayerService"/>
     </application>
 
 </manifest>

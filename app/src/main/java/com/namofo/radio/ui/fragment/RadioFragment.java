@@ -3,7 +3,6 @@ package com.namofo.radio.ui.fragment;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -20,8 +19,8 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.namofo.radio.R;
 import com.namofo.radio.service.AudioPlayer;
+import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.service.RadioPlayer;
-import com.namofo.radio.service.RadioService;
 import com.namofo.radio.ui.MainActivity;
 import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
@@ -62,7 +61,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
     @BindView(R.id.btn_test_stop)
     Button btnTestStop;
 
-    private RadioService radioService;
+    private PlayerService mPlayerService;
 
     public static RadioFragment newInstance() {
 
@@ -92,14 +91,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
         RxView.clicks(btnStart)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)//两秒钟之内只取一个点击事件，防抖操作
                 .subscribe(aVoid -> {
-                    ContextWrapper contextWrapper = new ContextWrapper(getActivity());
-
-                    Intent intent = new Intent(getActivity(), RadioService.class);
-                    intent.setAction(RadioPlayer.RADIO_PLAY_ACTION);
-                    contextWrapper.startService(intent);
-                    if (radioService == null) {
-                        getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                    }
+                    startRadioService(RadioPlayer.RADIO_PLAY_ACTION, mConnection, null);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -126,28 +118,16 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
         RxView.clicks(btnStop)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)
                 .subscribe(aVoid -> {
-                    Intent intent = new Intent(getActivity(), RadioService.class);
-                    intent.setAction(RadioPlayer.RADIO_STOP_ACTION);
-                    getContext().startService(intent);
-                    if (radioService == null) {
-                        getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                    }
+                    startRadioService(RadioPlayer.RADIO_STOP_ACTION, mConnection, null);
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
 
-        AudioPlayer mAudioPlayer = new AudioPlayer(getActivity());
         RxView.clicks(btnTestStart)
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Intent intent = new Intent(getActivity(), RadioService.class);
-                        intent.setAction(AudioPlayer.AUDIO_PLAY_ACTION);
-                        intent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
-                        getContext().startService(intent);
-                        if (radioService == null) {
-                            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                        }
+                        startRadioService(AudioPlayer.AUDIO_PLAY_ACTION, mConnection, "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
                     }
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
@@ -156,12 +136,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Intent intent = new Intent(getActivity(), RadioService.class);
-                        intent.setAction(AudioPlayer.AUDIO_PAUSE_ACTION);
-                        getContext().startService(intent);
-                        if (radioService == null) {
-                            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                        }
+                        startRadioService(AudioPlayer.AUDIO_PAUSE_ACTION, mConnection, null);
                     }
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
@@ -170,38 +145,37 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Intent intent = new Intent(getActivity(), RadioService.class);
-                        intent.setAction(AudioPlayer.AUDIO_RESUME_ACTION);
-                        getContext().startService(intent);
-                        if (radioService == null) {
-                            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                        }
+                        startRadioService(AudioPlayer.AUDIO_RESUME_ACTION, mConnection, null);
                     }
                 });
         RxView.clicks(btnTestStop)
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Intent intent = new Intent(getActivity(), RadioService.class);
-                        intent.setAction(AudioPlayer.AUDIO_STOP_ACTION);
-                        getContext().startService(intent);
-                        if (radioService == null) {
-                            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                        }
+                        startRadioService(AudioPlayer.AUDIO_STOP_ACTION, mConnection, null);
                     }
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
     }
 
+    private void startRadioService(String action, ServiceConnection mConnection, String dataSource) {
+        Intent intent = new Intent(getActivity(), PlayerService.class);
+        intent.setAction(action);
+        if (dataSource != null) {
+            intent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, dataSource);
+        }
+        getContext().startService(intent);
+        if (mPlayerService == null) {
+            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Intent intent = new Intent(getActivity(), RadioService.class);
-        intent.setAction(RadioPlayer.RADIO_PLAY_ACTION);
-        //getContext().startService(intent);
 
-        //getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startRadioService(RadioPlayer.RADIO_PLAY_ACTION, mConnection, null);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -212,10 +186,10 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             LogUtils.sout("onServiceConnected");
-            radioService = ((RadioService.RadioBinder) service).getService();
-            if (radioService != null) {
-                radioService.getRadioPlayer().setLoadingListener(RadioFragment.this);
-                if (radioService.getRadioPlayer().isPlaying()) {
+            mPlayerService = ((PlayerService.RadioBinder) service).getService();
+            if (mPlayerService != null) {
+                mPlayerService.getRadioPlayer().setLoadingListener(RadioFragment.this);
+                if (mPlayerService.getRadioPlayer().isPlaying()) {
                     onRadioPlay();
                 }
             }
@@ -230,9 +204,9 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
             // Because it is running in our same process, we should never
             // see this happen.
             LogUtils.sout("onServiceDisconnected");
-            if (radioService != null) {
-                radioService.getRadioPlayer().setLoadingListener(null);
-                radioService = null;
+            if (mPlayerService != null) {
+                mPlayerService.getRadioPlayer().setLoadingListener(null);
+                mPlayerService = null;
             }
         }
     };
@@ -260,8 +234,8 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
     @Override
     public void onDetach() {
         super.onDetach();
-        if (radioService != null) {
-            radioService.getRadioPlayer().setLoadingListener(null);
+        if (mPlayerService != null) {
+            mPlayerService.getRadioPlayer().setLoadingListener(null);
         }
     }
 }

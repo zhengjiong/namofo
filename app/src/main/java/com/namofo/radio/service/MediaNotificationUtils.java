@@ -39,13 +39,26 @@ public class MediaNotificationUtils {
     public Notification createRadioNotification(boolean isStopped) {
         PendingIntent clickIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent playIntent = new Intent(mContext, RadioService.class);
-        playIntent.setAction(RadioPlayer.RADIO_PLAY_ACTION);
-        PendingIntent playPendingIntent = PendingIntent.getService(mContext, 1, playIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        /**
+         * FLAG_CANCEL_CURRENT:如果当前系统中已经存在一个相同的 PendingIntent 对象，那么就将先将已有的 PendingIntent 取消，然后重新生成一个 PendingIntent 对象。
 
-        Intent stopIntent = new Intent(mContext, RadioService.class);
+         * FLAG_NO_CREATE:如果当前系统中不存在相同的 PendingIntent 对象，系统将不会创建该 PendingIntent 对象而是直接返回 null 。
+
+         * FLAG_ONE_SHOT:该 PendingIntent 只作用一次。
+
+         * FLAG_UPDATE_CURRENT:如果系统中已存在该 PendingIntent 对象，那么系统将保留该 PendingIntent 对象，但是会使用新的 Intent 来更新之前 PendingIntent 中的 Intent 对象数据，例如更新 Intent 中的 Extras 。
+         */
+        Intent closeIntent = new Intent(mContext, PlayerService.class);
+        closeIntent.setAction(RadioPlayer.RADIO_CLOSE_ACTION);
+        PendingIntent closePendingIntent = PendingIntent.getService(mContext, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent playIntent = new Intent(mContext, PlayerService.class);
+        playIntent.setAction(RadioPlayer.RADIO_PLAY_ACTION);
+        PendingIntent playPendingIntent = PendingIntent.getService(mContext, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent stopIntent = new Intent(mContext, PlayerService.class);
         stopIntent.setAction(RadioPlayer.RADIO_STOP_ACTION);
-        PendingIntent stopPendingIntent = PendingIntent.getService(mContext, 2, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent stopPendingIntent = PendingIntent.getService(mContext, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //MediaSessionCompat mSession = new MediaSessionCompat(getActivity(), "namofo");
         //mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -66,6 +79,7 @@ public class MediaNotificationUtils {
                 .setWhen(System.currentTimeMillis())
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)//制定通知的分类
                 //.setCustomBigContentView()//指定展开时的视图
+
                 .setGroupSummary(true)
                 .setGroup(Constants.NOTIFICATION_GROUP_NAME);
         //.setSubText("YY直播")
@@ -87,10 +101,11 @@ public class MediaNotificationUtils {
             builder.setPriority(NotificationCompat.PRIORITY_MAX);//会排到最上面
             builder.addAction(R.drawable.uamp_ic_pause_white_24dp, "", stopPendingIntent);
         }
+        builder.addAction(R.drawable.ic_close_white_24dp, "", closePendingIntent);
         builder.setVisibility(Notification.VISIBILITY_PUBLIC);
 
 
-        MediaSessionCompat mSession = new MediaSessionCompat(mContext, "NamofoRadio");
+        /*MediaSessionCompat mSession = new MediaSessionCompat(mContext, "NamofoRadio");
         mSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
             public void onPrepare() {
@@ -124,10 +139,10 @@ public class MediaNotificationUtils {
         });
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mSession.setActive(true);
+        mSession.setActive(true);*/
         android.support.v7.app.NotificationCompat.MediaStyle style = new android.support.v7.app.NotificationCompat.MediaStyle()
-                .setMediaSession(mSession.getSessionToken())
-                .setShowActionsInCompactView(0);
+                //.setMediaSession(mSession.getSessionToken())
+                .setShowActionsInCompactView(0, 1);
         builder.setStyle(style);
         //builder.setColor(Palette.from(artwork).generate().getVibrantColor(Color.parseColor("#403f4d")));
         builder.setColor(mContext.getResources().getColor(R.color.colorPrimary));
@@ -142,13 +157,18 @@ public class MediaNotificationUtils {
     public Notification createAudioNotification(boolean isStopped) {
         PendingIntent clickIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent playIntent = new Intent(mContext, RadioService.class);
-        playIntent.setAction(RadioPlayer.RADIO_PLAY_ACTION);
-        PendingIntent playPendingIntent = PendingIntent.getService(mContext, 1, playIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent closeIntent = new Intent(mContext, PlayerService.class);
+        closeIntent.setAction(AudioPlayer.AUDIO_CLOSE_ACTION);
+        PendingIntent closePendingIntent = PendingIntent.getService(mContext, 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent(mContext, RadioService.class);
-        stopIntent.setAction(RadioPlayer.RADIO_STOP_ACTION);
-        PendingIntent stopPendingIntent = PendingIntent.getService(mContext, 2, stopIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent playIntent = new Intent(mContext, PlayerService.class);
+        playIntent.setAction(AudioPlayer.AUDIO_PLAY_ACTION);
+        playIntent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
+        PendingIntent playPendingIntent = PendingIntent.getService(mContext, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent stopIntent = new Intent(mContext, PlayerService.class);
+        stopIntent.setAction(AudioPlayer.AUDIO_STOP_ACTION);
+        PendingIntent stopPendingIntent = PendingIntent.getService(mContext, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //MediaSessionCompat mSession = new MediaSessionCompat(getActivity(), "namofo");
         //mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -190,10 +210,11 @@ public class MediaNotificationUtils {
             builder.setPriority(NotificationCompat.PRIORITY_MAX);//会排到最上面
             builder.addAction(R.drawable.uamp_ic_pause_white_24dp, "", stopPendingIntent);
         }
+        builder.addAction(R.drawable.ic_close_white_24dp, "", closePendingIntent);
         builder.setVisibility(Notification.VISIBILITY_PUBLIC);
 
 
-        MediaSessionCompat mSession = new MediaSessionCompat(mContext, "NamofoRadio");
+        /*MediaSessionCompat mSession = new MediaSessionCompat(mContext, "NamofoRadio");
         mSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
             public void onPrepare() {
@@ -227,10 +248,10 @@ public class MediaNotificationUtils {
         });
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mSession.setActive(true);
+        mSession.setActive(true);*/
         android.support.v7.app.NotificationCompat.MediaStyle style = new android.support.v7.app.NotificationCompat.MediaStyle()
-                .setMediaSession(mSession.getSessionToken())
-                .setShowActionsInCompactView(0);
+                //.setMediaSession(mSession.getSessionToken())
+                .setShowActionsInCompactView(0, 1);
         builder.setStyle(style);
         //builder.setColor(Palette.from(artwork).generate().getVibrantColor(Color.parseColor("#403f4d")));
         builder.setColor(mContext.getResources().getColor(R.color.colorPrimary));

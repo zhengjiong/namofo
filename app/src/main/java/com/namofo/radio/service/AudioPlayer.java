@@ -28,6 +28,7 @@ public class AudioPlayer {
     public static final String AUDIO_PAUSE_ACTION = "com.namofo.audio.pause";
     public static final String AUDIO_RESUME_ACTION = "com.namofo.audio.resume";
     public static final String AUDIO_STOP_ACTION = "com.namofo.audio.stop";
+    public static final String AUDIO_CLOSE_ACTION = "com.namofo.audio.close";
 
     public static final String EXTRA_NAME_AUDIO_DATA_SOURCE = "extra_audio_data_source";
     //mMediaPlayer.setDataSource("http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
@@ -38,9 +39,8 @@ public class AudioPlayer {
     protected boolean mIsStopped = false;
 
     public static final int AUDIO_SESSION_ID = 999;
+    public PlayerService mService;
 
-    private NotificationManagerCompat mNotificationManager;
-    private MediaNotificationUtils mMediaNotificationUtils;
 
     private IOnLoadingListener mLoadingListener;
 
@@ -56,9 +56,8 @@ public class AudioPlayer {
         void onAudioStop();
     }
 
-    public AudioPlayer(Context context) {
-        mMediaNotificationUtils = new MediaNotificationUtils(context);
-        mNotificationManager = NotificationManagerCompat.from(context);
+    public AudioPlayer(PlayerService context) {
+        mService = context;
     }
 
     private void initMediaPlayer() {
@@ -72,7 +71,7 @@ public class AudioPlayer {
                 mIsStopped = false;
                 LogUtils.sout("mMediaPlayer onPrepared");
                 mp.start();
-                mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(false));
+                mService.notifyAudioPlay();
             }
         });
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -97,7 +96,7 @@ public class AudioPlayer {
                         if (mLoadingListener != null) {
                             mLoadingListener.onAudioPlay();
                         }
-                        ((RadioService)mContext).startForeground(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(mIsStopped));
+                        ((PlayerService)mContext).startForeground(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(mIsStopped));
                         break;
                     default:
                         break;
@@ -155,7 +154,7 @@ public class AudioPlayer {
         if (mLoadingListener != null) {
             mLoadingListener.onAudioStop();
         }
-        mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(true));
+        mService.notifyAudioStop();
     }
 
     public void release() {

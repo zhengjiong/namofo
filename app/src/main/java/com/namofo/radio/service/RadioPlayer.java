@@ -28,13 +28,11 @@ import java.io.IOException;
  * @version 1.0
  */
 public class RadioPlayer {
-    //public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
+    public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
     //public static final String RTMP = "http://26795.hlsplay.aodianyun.com/qingxinrensheng/stream.m3u8";
     //public static final String RTMP = "http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8";
-    public static final String RTMP = "rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583";
-    private Context mContext;
-    private NotificationManagerCompat mNotificationManager;
-    protected MediaNotificationUtils mMediaNotificationUtils;
+//    public static final String RTMP = "rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583";
+    public PlayerService mService;
     private PLMediaPlayer mPLMediaPlayer;
     private AVOptions mAVOptions;
     protected boolean mIsStopped = false;
@@ -43,6 +41,7 @@ public class RadioPlayer {
 
     public static final String RADIO_PLAY_ACTION = "com.namofo.radio.play";
     public static final String RADIO_STOP_ACTION = "com.namofo.radio.stop";
+    public static final String RADIO_CLOSE_ACTION = "com.namofo.radio.close";
 
     private static final int MESSAGE_WHAT_ID_RECONNECTING = 0x1;//重新连接
     private static final int RECONNECT_DELAY_MILLIS = 3000;//重连延迟时间
@@ -57,10 +56,8 @@ public class RadioPlayer {
         void onRadioStop();
     }
 
-    public RadioPlayer(Context context) {
-        mContext = context;
-        mMediaNotificationUtils = new MediaNotificationUtils(mContext);
-        mNotificationManager = NotificationManagerCompat.from(mContext);
+    public RadioPlayer(PlayerService service) {
+        mService = service;
         initAVOptions();
     }
 
@@ -111,13 +108,13 @@ public class RadioPlayer {
     private void prepare() {
         LogUtils.sout("prepare");
         if (mPLMediaPlayer == null) {
-            mPLMediaPlayer = new PLMediaPlayer(mContext, mAVOptions);
+            mPLMediaPlayer = new PLMediaPlayer(mService, mAVOptions);
             mPLMediaPlayer.setOnPreparedListener(mOnPreparedListener);
             mPLMediaPlayer.setOnCompletionListener(mOnCompletionListener);
             mPLMediaPlayer.setOnErrorListener(mOnErrorListener);
             mPLMediaPlayer.setOnInfoListener(mOnInfoListener);
             //mPLMediaPlayer.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
-            mPLMediaPlayer.setWakeMode(mContext, PowerManager.PARTIAL_WAKE_LOCK);
+            mPLMediaPlayer.setWakeMode(mService, PowerManager.PARTIAL_WAKE_LOCK);
         }
         try {
             //mPLMediaPlayer.setDataSource("rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583");
@@ -143,7 +140,7 @@ public class RadioPlayer {
             /**
              * AUDIOFOCUS_GAIN指示申请得到的Audio Focus不知道会持续多久，一般是长期占有；
              */
-            AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager audioManager = (AudioManager) mService.getSystemService(Context.AUDIO_SERVICE);
             audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         }
     };
@@ -187,10 +184,10 @@ public class RadioPlayer {
                     if (mLoadingListener != null) {
                         mLoadingListener.onRadioPlay();
                     }
-                    ((RadioService)mContext).startForeground(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(mIsStopped));
+                    mService.notifyRadioPlay();
                     break;
                 case PLMediaPlayer.MEDIA_INFO_SWITCHING_SW_DECODE:
-                    ToastUtils.showShort(mContext, R.string.error_media_info_switching_sw_decode);
+                    ToastUtils.showShort(mService, R.string.error_media_info_switching_sw_decode);
                 default:
                     break;
             }
@@ -286,7 +283,7 @@ public class RadioPlayer {
     };
 
     private void sendReconnectMessage() {
-        //ToastUtils.showShort(mContext, R.string.re_connect);
+        //ToastUtils.showShort(mService, R.string.re_connect);
         if (mLoadingListener != null) {
             mLoadingListener.onRadioLoading();
             //loadView.setVisibility(View.VISIBLE);
@@ -305,7 +302,7 @@ public class RadioPlayer {
             /*if (mIsActivityPaused || !Utils.isLiveStreamingAvailable()) {
                 return;
             }*/
-            if (!Utils.isNetworkAvailable(mContext)) {
+            if (!Utils.isNetworkAvailable(mService)) {
                 LogUtils.sout("mHandler 网络不可用 sendReconnectMessage");
                 sendReconnectMessage();
                 return;
@@ -319,23 +316,14 @@ public class RadioPlayer {
         if (mIsActivityPaused) {
             return;
         }
-        ToastUtils.showShort(mContext, resId);
+        ToastUtils.showShort(mService, resId);
     }
 
     public void showToast(String message) {
         if (mIsActivityPaused) {
             return;
         }
-        ToastUtils.showShort(mContext, message);
-    }
-
-    public void release() {
-        if (mPLMediaPlayer != null) {
-            mPLMediaPlayer.stop();
-            mPLMediaPlayer.release();
-            mPLMediaPlayer = null;
-        }
-        mHandler.removeCallbacksAndMessages(null);
+        ToastUtils.showShort(mService, message);
     }
 
     public void setLoadingListener(IOnLoadingListener loadingListener) {
@@ -361,7 +349,16 @@ public class RadioPlayer {
         }
 
         mHandler.removeCallbacksAndMessages(null);
-        mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(mIsStopped));
+    }
+
+    public void release() {
+        mIsPrepared = false;
+        if (mPLMediaPlayer != null) {
+            mPLMediaPlayer.stop();
+            mPLMediaPlayer.release();
+            mPLMediaPlayer = null;
+        }
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     public void play(){
@@ -381,6 +378,8 @@ public class RadioPlayer {
                 } else {
                     mPLMediaPlayer.start();
                 }
+            } else {
+                prepare();
             }
         }
 

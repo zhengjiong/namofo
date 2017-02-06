@@ -25,6 +25,7 @@ import com.namofo.radio.ui.MainActivity;
 import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
 import com.namofo.radio.util.LogUtils;
+import com.namofo.radio.view.playerview.MusicPlayerView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +62,9 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
     @BindView(R.id.btn_test_stop)
     Button btnTestStop;
 
+    @BindView(R.id.music_player_view)
+    MusicPlayerView mMusicPlayerView;
+
     private PlayerService mPlayerService;
 
     public static RadioFragment newInstance() {
@@ -87,7 +91,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
 
     private void initView(View view) {
         toolbar.setTitle(R.string.tab_radio);
-
+        mMusicPlayerView.setCoverDrawable(R.drawable.ic_empty_music2);
         RxView.clicks(btnStart)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)//两秒钟之内只取一个点击事件，防抖操作
                 .subscribe(aVoid -> {
@@ -157,6 +161,16 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
+
+        mMusicPlayerView.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                if (mMusicPlayerView.isRotating()) {
+                    mMusicPlayerView.stop();
+                } else {
+                    mMusicPlayerView.start();
+                }
+            }
+        });
     }
 
     private void startRadioService(String action, ServiceConnection mConnection, String dataSource) {
@@ -222,6 +236,12 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
         loadView.setVisibility(View.GONE);
         txtPlaying.setVisibility(View.VISIBLE);
         txtPlaying.setText(R.string.playing);
+        mMusicPlayerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mMusicPlayerView.start();
+            }
+        },700);
     }
 
     @Override
@@ -229,6 +249,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
         loadView.setVisibility(View.GONE);
         txtPlaying.setVisibility(View.VISIBLE);
         txtPlaying.setText(R.string.stopped);
+        mMusicPlayerView.stop();
     }
 
     @Override

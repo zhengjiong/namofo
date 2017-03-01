@@ -46,6 +46,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.1.0'
     compile 'com.android.support:palette-v7:25.1.0'
     compile 'com.android.support:mediarouter-v7:25.1.0'
+
     compile 'me.yokeyword:fragmentation:0.9.4'
     //compile 'io.reactivex:rxandroid:1.2.1'
     //compile "io.reactivex.rxjava2:rxjava:2.0.4"
@@ -92,6 +93,8 @@ dependencies {
     //compile 'tv.danmaku.ijk.media:ijkplayer-exo:0.4.5.1'
 
     compile 'org.greenrobot:greendao:3.2.0'
+
+    compile 'com.liulishuo.filedownloader:library:1.4.1'
 
     //compile 'com.github.daniel-stoneuk:material-about-library:1.5.0'//https://github.com/daniel-stoneuk/material-about-library
 }

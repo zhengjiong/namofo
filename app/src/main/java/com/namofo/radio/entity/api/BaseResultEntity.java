@@ -14,6 +14,6 @@ import java.util.List;
  */
 public class BaseResultEntity<T> {
     public boolean error;
-    public String errorMsg = "请求失败";
-    public T results;
+    public String message = "请求失败";
+    public T result;
 }

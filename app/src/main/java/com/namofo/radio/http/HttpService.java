@@ -1,6 +1,7 @@
 package com.namofo.radio.http;
 
 import com.namofo.radio.entity.MeiZhi;
+import com.namofo.radio.entity.RecordAlbum;
 import com.namofo.radio.entity.api.BaseResultEntity;
 
 import java.util.List;
@@ -20,4 +21,7 @@ import rx.Observable;
 public interface HttpService {
     @GET("data/福利/10/{page}")
     Observable<BaseResultEntity<List<MeiZhi>>> getMeizhi(@Path("page") int page);
+
+    @GET("web.do?key=getAlbumList")
+    Observable<BaseResultEntity<List<RecordAlbum>>> getRecordAlbumList();
 }

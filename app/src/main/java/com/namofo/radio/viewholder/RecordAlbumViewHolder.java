@@ -9,7 +9,7 @@ import com.namofo.radio.R;
 import com.namofo.radio.base.BaseViewHolder;
 
 /**
- * Title: MeiZhiViewHolder
+ * Title: RecordAlbumViewHolder
  * Description:
  * Copyright:Copyright(c)2016
  * Company: 博智维讯信息技术有限公司
@@ -18,13 +18,19 @@ import com.namofo.radio.base.BaseViewHolder;
  * @author 郑炯
  * @version 1.0
  */
-public class MeiZhiViewHolder extends BaseViewHolder {
+public class RecordAlbumViewHolder extends BaseViewHolder {
     public ImageView imageView;
     public TextView title;
+    public TextView tvAuthor;
+    public TextView tvCount;
+    public TextView tvDate;
 
-    public MeiZhiViewHolder(View itemView) {
+    public RecordAlbumViewHolder(View itemView) {
         super(itemView);
         imageView = (ImageView) itemView.findViewById(R.id.img);
         title = (TextView) itemView.findViewById(R.id.title);
+        tvAuthor = (TextView) itemView.findViewById(R.id.tv_author);
+        tvCount = (TextView) itemView.findViewById(R.id.tv_count);
+        tvDate = (TextView) itemView.findViewById(R.id.tv_date);
     }
 }

@@ -36,12 +36,12 @@ public class MeiZhiPresenter extends BasePresenter {
             @Override
             public void call(BaseResultEntity<List<MeiZhi>> responseEntity) {
                 if (responseEntity.error) {
-                    throw new HttpException(responseEntity.errorMsg);
+                    throw new HttpException(responseEntity.message);
                 }
-                if (responseEntity.results == null) {
-                    responseEntity.results = new ArrayList<MeiZhi>();
+                if (responseEntity.result == null) {
+                    responseEntity.result = new ArrayList<MeiZhi>();
                 }
-                onNext.call(responseEntity.results);
+                onNext.call(responseEntity.result);
             }
         }, new Action1<Throwable>() {
             @Override

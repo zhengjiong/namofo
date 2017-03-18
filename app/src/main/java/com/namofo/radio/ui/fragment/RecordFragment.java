@@ -13,14 +13,18 @@ import com.chanven.lib.cptr.PtrDefaultHandler;
 import com.chanven.lib.cptr.PtrFrameLayout;
 import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
-import com.namofo.radio.adapter.MeiZhiAdapter;
+import com.namofo.radio.adapter.RecordAlbumAdapter;
+import com.namofo.radio.entity.RecordAlbum;
+import com.namofo.radio.presenter.RadioListPresenter;
 import com.namofo.radio.ui.base.BaseFragment;
-import com.namofo.radio.presenter.MeiZhiPresenter;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 /**
  * Title: RadioFragment
@@ -40,9 +44,9 @@ public class RecordFragment extends BaseFragment {
     @BindView(R.id.ptr_layout)
     CustomPtrFrameLayout mPtrFrameLayout;
 
-    private MeiZhiPresenter mPresenter;
+    private RadioListPresenter mPresenter;
 
-    private MeiZhiAdapter mAdapter;
+    private RecordAlbumAdapter mAdapter;
     private RecyclerAdapterWithHF mPtrAdapter;
 
     public static RecordFragment newInstance() {
@@ -71,8 +75,8 @@ public class RecordFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter = new MeiZhiPresenter();
-        mAdapter = new MeiZhiAdapter();
+        mPresenter = new RadioListPresenter();
+        mAdapter = new RecordAlbumAdapter();
         mPtrAdapter = new RecyclerAdapterWithHF(mAdapter);
         mRecyclerView.setAdapter(mPtrAdapter);
         /*OkHttpClient.Builder builder = new OkHttpClient.Builder()
@@ -107,7 +111,7 @@ public class RecordFragment extends BaseFragment {
 
                     @Override
                     public void onNext(BaseResultEntity<List<MeiZhi>> response) {
-                        System.out.println("onNext call " + response.results.toString());
+                        System.out.println("onNext call " + response.result.toString());
                     }
 
                     @Override
@@ -129,14 +133,14 @@ public class RecordFragment extends BaseFragment {
     }
 
     private void refresh() {
-        mPresenter.refresh(meiZhis -> {
-            mAdapter.setData(meiZhis);
+        mPresenter.refresh(recordAlba -> {
+            mAdapter.setData(recordAlba);
             mPtrFrameLayout.refreshComplete();
-            mPtrFrameLayout.setLoadMoreEnable(meiZhis.size() != 0);
+            //mPtrFrameLayout.setLoadMoreEnable(recordAlba.size() != 0);//是否需要加载更多
         }, s -> {
             ToastUtils.showShort(getContext(), s);
             mPtrFrameLayout.refreshComplete();
-            mPtrFrameLayout.setLoadMoreEnable(false);
+            mPtrFrameLayout.setLoadMoreEnable(false);//是否需要加载更多
         });
     }
 
@@ -152,8 +156,9 @@ public class RecordFragment extends BaseFragment {
                 refresh();
             }
         });
-        mPtrFrameLayout.setAutoLoadMoreEnable(true);
-        mPtrFrameLayout.setOnLoadMoreListener(RecordFragment.this::loadMore);
+        mPtrFrameLayout.setLoadMoreEnable(false);//是否需要加载更多
+        //mPtrFrameLayout.setAutoLoadMoreEnable(false);//是否自动加载 默认true
+        //mPtrFrameLayout.setOnLoadMoreListener(RecordFragment.this::loadMore);
     }
 
     private void loadMore() {

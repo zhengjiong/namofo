@@ -62,21 +62,7 @@ public class HttpManager {
     }
 
     public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext) {
-        getObservable(httpObservable).subscribe(onNext);
-    }
-
-    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError) {
-        getObservable(httpObservable).subscribe(onNext, onError);
-    }
-
-    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError, Action0 onComplete) {
-        getObservable(httpObservable).subscribe(onNext, onError, onComplete);
-    }
-
-    private <T> Observable getObservable(Observable<T> httpObservable) {
-    /*结果判断*/
-        //.map(basePostEntity);
-        return (Observable) httpObservable
+        httpObservable
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
                 /*生命周期管理*/
@@ -85,9 +71,36 @@ public class HttpManager {
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                    /*回调线程*/
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext);
     }
 
+    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError) {
+        httpObservable
+                /*失败后的retry配置*/
+                .retryWhen(new RetryWhenNetworkException())
+                /*生命周期管理*/
+                //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
+                /*http请求线程*/
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                   /*回调线程*/
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext, onError);
+    }
+
+    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError, Action0 onComplete) {
+        httpObservable
+                /*结果判断*/
+                //.map(basePostEntity);
+                /*失败后的retry配置*/
+                .retryWhen(new RetryWhenNetworkException())
+                /*生命周期管理*/
+                //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
+                /*http请求线程*/
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                   /*回调线程*/
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext, onError, onComplete);
+    }
 
     /**
      * 请求响应日志信息，方便debug

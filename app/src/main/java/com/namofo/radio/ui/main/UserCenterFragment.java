@@ -1,4 +1,4 @@
-package com.namofo.radio.ui.fragment;
+package com.namofo.radio.ui.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

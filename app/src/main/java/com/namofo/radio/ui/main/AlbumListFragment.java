@@ -1,4 +1,4 @@
-package com.namofo.radio.ui.fragment;
+package com.namofo.radio.ui.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,20 +11,16 @@ import android.view.ViewGroup;
 
 import com.chanven.lib.cptr.PtrDefaultHandler;
 import com.chanven.lib.cptr.PtrFrameLayout;
-import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
-import com.namofo.radio.adapter.RecordAlbumAdapter;
-import com.namofo.radio.entity.RecordAlbum;
-import com.namofo.radio.presenter.RadioListPresenter;
+import com.namofo.radio.adapter.AlbumListAdapter;
+import com.namofo.radio.base.MyRecyclerAdapterWithHF;
+import com.namofo.radio.presenter.AlbumPresenter;
 import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 /**
  * Title: RadioFragment
@@ -35,7 +31,7 @@ import rx.functions.Action1;
  * @author 郑炯
  * @version 1.0
  */
-public class RecordFragment extends BaseFragment {
+public class AlbumListFragment extends BaseFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recyclerview)
@@ -44,16 +40,15 @@ public class RecordFragment extends BaseFragment {
     @BindView(R.id.ptr_layout)
     CustomPtrFrameLayout mPtrFrameLayout;
 
-    private RadioListPresenter mPresenter;
+    private AlbumPresenter mPresenter;
 
-    private RecordAlbumAdapter mAdapter;
-    private RecyclerAdapterWithHF mPtrAdapter;
+    private AlbumListAdapter mAdapter;
 
-    public static RecordFragment newInstance() {
+    public static AlbumListFragment newInstance() {
 
         Bundle args = new Bundle();
 
-        RecordFragment fragment = new RecordFragment();
+        AlbumListFragment fragment = new AlbumListFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,7 +56,7 @@ public class RecordFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tab_record_layout, container, false);
+        View view = inflater.inflate(R.layout.fragment_tab_audio_layout, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -75,10 +70,9 @@ public class RecordFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter = new RadioListPresenter();
-        mAdapter = new RecordAlbumAdapter();
-        mPtrAdapter = new RecyclerAdapterWithHF(mAdapter);
-        mRecyclerView.setAdapter(mPtrAdapter);
+        mPresenter = new AlbumPresenter();
+        mAdapter = new AlbumListAdapter(this);
+        mRecyclerView.setAdapter(new MyRecyclerAdapterWithHF(mAdapter));
         /*OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS);
@@ -158,7 +152,7 @@ public class RecordFragment extends BaseFragment {
         });
         mPtrFrameLayout.setLoadMoreEnable(false);//是否需要加载更多
         //mPtrFrameLayout.setAutoLoadMoreEnable(false);//是否自动加载 默认true
-        //mPtrFrameLayout.setOnLoadMoreListener(RecordFragment.this::loadMore);
+        //mPtrFrameLayout.setOnLoadMoreListener(AlbumListFragment.this::loadMore);
     }
 
     private void loadMore() {

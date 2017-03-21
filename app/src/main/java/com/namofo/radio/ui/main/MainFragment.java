@@ -1,4 +1,4 @@
-package com.namofo.radio.ui;
+package com.namofo.radio.ui.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,10 +10,6 @@ import com.namofo.radio.R;
 import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.event.StartBrotherEvent;
 import com.namofo.radio.event.TabSelectedEvent;
-import com.namofo.radio.ui.fragment.DownloadFragment;
-import com.namofo.radio.ui.fragment.RadioFragment;
-import com.namofo.radio.ui.fragment.RecordFragment;
-import com.namofo.radio.ui.fragment.UserCenterFragment;
 import com.namofo.radio.view.BottomBar;
 import com.namofo.radio.view.BottomBarTab;
 
@@ -53,7 +49,7 @@ public class MainFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         if (savedInstanceState == null) {
             mFragments[FIRST] = RadioFragment.newInstance();
-            mFragments[SECOND] = RecordFragment.newInstance();
+            mFragments[SECOND] = AlbumListFragment.newInstance();
             mFragments[THIRD] = DownloadFragment.newInstance();
             mFragments[FOUR] = UserCenterFragment.newInstance();
 
@@ -67,7 +63,7 @@ public class MainFragment extends BaseFragment {
 
             // 这里我们需要拿到mFragments的引用,也可以通过getChildFragmentManager.getFragments()自行进行判断查找(效率更高些),用下面的方法查找更方便些
             mFragments[FIRST] = findChildFragment(RadioFragment.class);
-            mFragments[SECOND] = findChildFragment(RecordFragment.class);
+            mFragments[SECOND] = findChildFragment(AlbumListFragment.class);
             mFragments[THIRD] = findChildFragment(DownloadFragment.class);
             mFragments[FOUR] = findChildFragment(UserCenterFragment.class);
         }

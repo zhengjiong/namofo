@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.namofo.radio.R;
+import com.namofo.radio.ui.main.MainActivity;
 
 /**
  * Title: LaunchActivity

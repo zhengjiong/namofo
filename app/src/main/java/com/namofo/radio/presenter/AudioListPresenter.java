@@ -2,14 +2,12 @@ package com.namofo.radio.presenter;
 
 import android.view.View;
 
-import com.namofo.radio.entity.MeiZhi;
-import com.namofo.radio.entity.RecordAlbum;
-import com.namofo.radio.entity.api.BaseResultEntity;
+import com.namofo.radio.entity.Album;
+import com.namofo.radio.entity.Audio;
 import com.namofo.radio.exception.HttpException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import rx.functions.Action1;
 
@@ -21,21 +19,21 @@ import rx.functions.Action1;
  * @author 郑炯
  * @version 1.0
  */
-public class RadioListPresenter extends BasePresenter<View> {
+public class AudioListPresenter extends BasePresenter<View> {
     private int page = 1;
 
-    public void refresh(Action1<List<RecordAlbum>> onNext, Action1<String> onError){
+    public void refresh(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
         page = 1;
-        loadData(onNext, onError);
+        loadData(album, onNext, onError);
     }
 
-    public void loadMore(Action1<List<RecordAlbum>> onNext, Action1<String> onError) {
+    public void loadMore(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
         page++;
-        loadData(onNext, onError);
+        loadData(album, onNext, onError);
     }
 
-    private void loadData(Action1<List<RecordAlbum>> onNext, Action1<String> onError){
-        submitRequest(httpManager.getHttpService().getRecordAlbumList(), responseEntity -> {
+    private void loadData(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
+        submitRequest(getHttpService().getAudio(album+""), responseEntity -> {
             if (responseEntity.error) {
                 throw new HttpException(responseEntity.message);
             }

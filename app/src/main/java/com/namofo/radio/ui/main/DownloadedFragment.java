@@ -1,4 +1,4 @@
-package com.namofo.radio.ui.fragment;
+package com.namofo.radio.ui.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,26 +15,24 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Title: UnDownloadFragment
- * Description:
- * Copyright:Copyright(c)2016
- * CreateTime:17/1/25  10:07
+ * Title: DownloadedFragment
+ * CreateTime:17/1/25  09:51
  *
  * @author 郑炯
  * @version 1.0
  */
-public class UnDownloadFragment extends BaseFragment {
+public class DownloadedFragment extends BaseFragment {
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerview;
     @BindView(R.id.ptr_layout)
     CustomPtrFrameLayout ptrLayout;
 
-    public static UnDownloadFragment newInstance() {
+    public static DownloadedFragment newInstance() {
 
         Bundle args = new Bundle();
 
-        UnDownloadFragment fragment = new UnDownloadFragment();
+        DownloadedFragment fragment = new DownloadedFragment();
         fragment.setArguments(args);
         return fragment;
     }

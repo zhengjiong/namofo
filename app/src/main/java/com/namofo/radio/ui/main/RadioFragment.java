@@ -1,4 +1,4 @@
-package com.namofo.radio.ui.fragment;
+package com.namofo.radio.ui.main;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -21,7 +21,6 @@ import com.namofo.radio.R;
 import com.namofo.radio.service.AudioPlayer;
 import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.service.RadioPlayer;
-import com.namofo.radio.ui.MainActivity;
 import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
 import com.namofo.radio.util.LogUtils;

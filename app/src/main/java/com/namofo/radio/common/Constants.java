@@ -12,6 +12,7 @@ package com.namofo.radio.common;
  */
 public class Constants {
     //public static final String BASE_URL = "http://gank.io/api/";
+    public static final String HHMMSS = "HH:MM:ss";
     public static final String BASE_URL = "http://app.namofo.org/";
 
     public static final int TIMEOUT = 15;

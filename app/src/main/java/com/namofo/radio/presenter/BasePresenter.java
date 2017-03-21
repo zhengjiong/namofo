@@ -6,6 +6,7 @@ import android.widget.Toast;
 import com.namofo.radio.entity.MeiZhi;
 import com.namofo.radio.entity.api.BaseResultEntity;
 import com.namofo.radio.http.HttpManager;
+import com.namofo.radio.http.HttpService;
 
 import java.util.List;
 
@@ -26,6 +27,10 @@ import rx.functions.Action1;
  */
 public abstract class BasePresenter<V> implements Presenter<V>{
     HttpManager httpManager = HttpManager.getInstance();
+
+    public HttpService getHttpService(){
+        return httpManager.getHttpService();
+    }
 
     public <T> void submitRequest(Observable<T> observable,  Action1<T> onNext){
         httpManager.doHttp(observable, onNext);

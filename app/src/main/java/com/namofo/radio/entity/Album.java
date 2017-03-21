@@ -1,7 +1,7 @@
 package com.namofo.radio.entity;
 
 /**
- * Title: RecordAlbum
+ * Title: Album
  * Description:
  * Copyright:Copyright(c)2016
  * Company: 博智维讯信息技术有限公司
@@ -10,7 +10,7 @@ package com.namofo.radio.entity;
  * @author 郑炯
  * @version 1.0
  */
-public class RecordAlbum {
+public class Album {
 
 
     /**

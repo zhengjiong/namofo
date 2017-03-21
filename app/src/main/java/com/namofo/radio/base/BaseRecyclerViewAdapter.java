@@ -23,7 +23,7 @@ import java.util.List;
  * @author 郑炯
  * @version 1.0
  */
-public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> {
+public abstract class BaseRecyclerViewAdapter<T,VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     private ArrayList<T> mList = new ArrayList<T>();
 

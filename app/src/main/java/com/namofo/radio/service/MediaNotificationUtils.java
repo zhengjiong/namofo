@@ -6,15 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 
 import com.namofo.radio.R;
 import com.namofo.radio.common.Constants;
-import com.namofo.radio.ui.MainActivity;
-import com.namofo.radio.util.LogUtils;
+import com.namofo.radio.ui.main.MainActivity;
 
 /**
  * Title: MediaNotificationUtils

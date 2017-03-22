@@ -12,4 +12,5 @@ package com.namofo.radio.common;
  */
 public class IntentKey {
     public static final String KEY_ALBUM_ID = "KEY_ALBUM_ID";
+    public static final String KEY_TITLE = "KEY_TITLE";
 }

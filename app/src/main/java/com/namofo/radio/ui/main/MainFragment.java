@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
-import com.namofo.radio.ui.base.BaseFragment;
+import com.namofo.radio.ui.base.RxFragment;
 import com.namofo.radio.event.StartBrotherEvent;
 import com.namofo.radio.event.TabSelectedEvent;
 import com.namofo.radio.view.BottomBar;
@@ -24,13 +24,13 @@ import org.greenrobot.eventbus.Subscribe;
  * @author 郑炯
  * @version 1.0
  */
-public class MainFragment extends BaseFragment {
+public class MainFragment extends RxFragment {
     public static final int FIRST = 0;
     public static final int SECOND = 1;
     public static final int THIRD = 2;
     public static final int FOUR = 3;
 
-    private BaseFragment mFragments[] = new BaseFragment[4];
+    private RxFragment mFragments[] = new RxFragment[4];
 
     private BottomBar mBottomBar;
 
@@ -131,4 +131,5 @@ public class MainFragment extends BaseFragment {
         EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
+
 }

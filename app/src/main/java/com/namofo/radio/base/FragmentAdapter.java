@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import com.namofo.radio.ui.base.BaseFragment;
+import com.namofo.radio.ui.base.RxFragment;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class FragmentAdapter extends FragmentPagerAdapter {
     }
     @Override
     public Fragment getItem(int position) {
-        BaseFragment fragment = (BaseFragment) mFragments.get(position);
+        RxFragment fragment = (RxFragment) mFragments.get(position);
         //fragment.setPool(mPool);
         return fragment;
     }

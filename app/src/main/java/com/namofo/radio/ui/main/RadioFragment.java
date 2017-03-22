@@ -16,12 +16,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.namofo.radio.R;
 import com.namofo.radio.service.AudioPlayer;
 import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.service.RadioPlayer;
-import com.namofo.radio.ui.base.BaseFragment;
+import com.namofo.radio.ui.base.RxFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
 import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.view.RotatePlayView;
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
 
 /**
  * Description: 直播
@@ -40,7 +40,7 @@ import rx.functions.Action1;
  * @author 郑炯
  * @version 1.0
  */
-public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadingListener {
+public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -132,34 +132,38 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
                 });
 
         RxView.clicks(btnTestStart)
-                .subscribe(new Action1<Void>() {
+                .subscribe(new Consumer<Object>() {
                     @Override
-                    public void call(Void aVoid) {
-                        startRadioService(AudioPlayer.AUDIO_PLAY_ACTION, mConnection, "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
+                    public void accept(Object o) throws Exception {
+                        startRadioService(
+                                AudioPlayer.AUDIO_PLAY_ACTION,
+                                mConnection,
+                                "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a"
+                        );
                     }
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
         RxView.clicks(btnTestPause)
-                .subscribe(new Action1<Void>() {
+                .subscribe(new Consumer<Object>() {
                     @Override
-                    public void call(Void aVoid) {
+                    public void accept(Object o) throws Exception {
                         startRadioService(AudioPlayer.AUDIO_PAUSE_ACTION, mConnection, null);
                     }
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
         RxView.clicks(btnTestResume)
-                .subscribe(new Action1<Void>() {
+                .subscribe(new Consumer<Object>() {
                     @Override
-                    public void call(Void aVoid) {
+                    public void accept(Object o) throws Exception {
                         startRadioService(AudioPlayer.AUDIO_RESUME_ACTION, mConnection, null);
                     }
                 });
         RxView.clicks(btnTestStop)
-                .subscribe(new Action1<Void>() {
+                .subscribe(new Consumer<Object>() {
                     @Override
-                    public void call(Void aVoid) {
+                    public void accept(Object o) throws Exception {
                         startRadioService(AudioPlayer.AUDIO_STOP_ACTION, mConnection, null);
                     }
                 }, throwable -> {
@@ -167,7 +171,8 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
                 });
 
         mMusicPlayerView.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 if (mMusicPlayerView.isRotating()) {
                     mMusicPlayerView.stop();
                 } else {
@@ -246,7 +251,7 @@ public class RadioFragment extends BaseFragment implements RadioPlayer.IOnLoadin
             public void run() {
                 mMusicPlayerView.start();
             }
-        },700);
+        }, 700);
     }
 
     @Override

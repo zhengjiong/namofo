@@ -1,19 +1,11 @@
 package com.namofo.radio.presenter;
 
-import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
-
-import com.namofo.radio.entity.MeiZhi;
-import com.namofo.radio.entity.api.BaseResultEntity;
 import com.namofo.radio.http.HttpManager;
 import com.namofo.radio.http.HttpService;
 
-import java.util.List;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.functions.Action1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 /**
  * Title: BasePresenter
@@ -32,15 +24,15 @@ public abstract class BasePresenter<V> implements Presenter<V>{
         return httpManager.getHttpService();
     }
 
-    public <T> void submitRequest(Observable<T> observable,  Action1<T> onNext){
+    public <T> void submitRequest(Observable<T> observable, Consumer<T> onNext){
         httpManager.doHttp(observable, onNext);
     }
 
-    public <T> void submitRequest(Observable<T> observable,  Action1<T> onNext, Action1<Throwable> onError){
+    public <T> void submitRequest(Observable<T> observable,  Consumer<T> onNext, Consumer<Throwable> onError){
         httpManager.doHttp(observable, onNext, onError);
     }
 
-    public <T> void submitRequest(Observable<T> observable,  Action1<T> onNext, Action1<Throwable> onError, Action0 onComplete){
+    public <T> void submitRequest(Observable<T> observable,  Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete){
         httpManager.doHttp(observable, onNext, onError, onComplete);
     }
 

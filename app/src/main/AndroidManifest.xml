@@ -28,8 +28,7 @@
             android:launchMode="singleTask"/>
         <activity android:name=".ui.TestActivity"/>
 
-        <service
-            android:name=".service.PlayerService"/>
+        <service android:name=".service.PlayerService"/>
     </application>
 
 </manifest>

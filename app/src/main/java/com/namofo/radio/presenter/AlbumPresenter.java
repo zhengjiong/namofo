@@ -10,7 +10,8 @@ import com.namofo.radio.exception.HttpException;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
+
 
 /**
  * Title: AlbumPresenter
@@ -25,17 +26,17 @@ import rx.functions.Action1;
 public class AlbumPresenter extends BasePresenter<View> {
     public int page;
 
-    public void refresh(Action1<List<Album>> onNext, Action1<String> onError) {
+    public void refresh(Consumer<List<Album>> onNext, Consumer<String> onError) {
         page = 1;
         requestList(page, onNext, onError);
     }
 
-    public void loadMore(Action1<List<Album>> onNext, Action1<String> onError) {
+    public void loadMore(Consumer<List<Album>> onNext, Consumer<String> onError) {
         page++;
         requestList(page, onNext, onError);
     }
 
-    public void requestList(int album, Action1<List<Album>> onNext, Action1<String> onError) {
+    public void requestList(int album, Consumer<List<Album>> onNext, Consumer<String> onError) {
         submitRequest(getHttpService().getRecordAlbumList(), result -> {
             if (result.error) {
                 throw new HttpException(result.message);
@@ -44,7 +45,7 @@ public class AlbumPresenter extends BasePresenter<View> {
             if (audios == null) {
                 audios = new ArrayList<>();
             }
-            onNext.call(audios);
-        }, throwable -> onError.call(throwable.getMessage()));
+            onNext.accept(audios);
+        }, throwable -> onError.accept(throwable.getMessage()));
     }
 }

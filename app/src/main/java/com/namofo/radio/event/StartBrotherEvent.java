@@ -1,14 +1,14 @@
 package com.namofo.radio.event;
 
-import com.namofo.radio.ui.base.BaseFragment;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Created by YoKeyword on 16/6/30.
  */
 public class StartBrotherEvent {
-    public BaseFragment targetFragment;
+    public SupportFragment targetFragment;
 
-    public StartBrotherEvent(BaseFragment targetFragment) {
+    public StartBrotherEvent(SupportFragment targetFragment) {
         this.targetFragment = targetFragment;
     }
 }

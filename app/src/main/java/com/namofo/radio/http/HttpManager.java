@@ -2,24 +2,28 @@ package com.namofo.radio.http;
 
 import com.namofo.radio.common.Constants;
 import com.namofo.radio.exception.RetryWhenNetworkException;
+import com.namofo.radio.retrofit.CustomGsonConvertFactor;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 /**
  * CreateTime:17/1/16  17:32
@@ -28,20 +32,20 @@ import rx.schedulers.Schedulers;
  * @version 1.0
  */
 public class HttpManager {
-
+    private static final String TAG = "HttpManager";
     private HttpService httpService;
 
     private HttpManager() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .addInterceptor(new LoggingInterceptor())//加了会出问题
+                .addInterceptor(new LoggingInterceptor())
                 //.addInterceptor(loggingInterceptor)
                 .connectTimeout(Constants.TIMEOUT, TimeUnit.SECONDS);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(CustomGsonConvertFactor.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(Constants.BASE_URL)
                 .client(builder.build())
                 .build();
@@ -61,7 +65,7 @@ public class HttpManager {
         return httpService;
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext) {
+    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext) {
         httpObservable
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
@@ -74,7 +78,7 @@ public class HttpManager {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext);
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError) {
+    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError) {
         httpObservable
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
@@ -87,7 +91,7 @@ public class HttpManager {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext, onError);
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Action1<T> onNext, Action1<Throwable> onError, Action0 onComplete) {
+    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete) {
         httpObservable
                 /*结果判断*/
                 //.map(basePostEntity);
@@ -115,10 +119,9 @@ public class HttpManager {
                     request.url(), chain.connection(), request.headers()));
 
             Response response = chain.proceed(request);
-
-            /*long t2 = System.nanoTime();
-            Logger.i(String.format("Received response for %s in %.1fms%n%s\nresult=%s",
-                    response.request().url(), (t2 - t1) / 1e6d, response.headers(), response.body().string()));*/
+            long t2 = System.nanoTime();
+            Logger.i(String.format("Received response for %s in %.1fms%n%s",
+                    response.request().url(), (t2 - t1) / 1e6d, response.headers()));
 
             return response;
         }

@@ -12,7 +12,6 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import android.util.Log;
 
-import rx.Subscriber;
 
 /**
  * CreateTime:17/1/19  17:49
@@ -20,6 +19,7 @@ import rx.Subscriber;
  * @author 郑炯
  * @version 1.0
  */
+/*@Deprecated
 public class ProgressSubscriber<T> extends Subscriber<T> {
 
     //    回调接口
@@ -46,9 +46,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
     }
 
 
-    /**
+    *//**
      * 初始化加载框
-     */
+     *//*
     private void initProgressDialog() {
         Context context = mActivity.get();
         if (pd == null && context != null) {
@@ -66,9 +66,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
     }
 
 
-    /**
+    *//**
      * 显示加载框
-     */
+     *//*
     private void showProgressDialog() {
         Context context = mActivity.get();
         if (pd == null || context == null) return;
@@ -78,9 +78,9 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
     }
 
 
-    /**
+    *//**
      * 隐藏
-     */
+     *//*
     private void dismissProgressDialog() {
         if (pd != null && pd.isShowing()) {
             pd.dismiss();
@@ -88,29 +88,29 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
     }
 
 
-    /**
+    *//**
      * 订阅开始时调用
      * 显示ProgressDialog
-     */
+     *//*
     @Override
     public void onStart() {
         showProgressDialog();
     }
 
-    /**
+    *//**
      * 完成，隐藏ProgressDialog
-     */
+     *//*
     @Override
     public void onCompleted() {
         dismissProgressDialog();
     }
 
-    /**
+    *//**
      * 对错误进行统一处理
      * 隐藏ProgressDialog
      *
      * @param e
-     */
+     *//*
     @Override
     public void onError(Throwable e) {
         Context context = mActivity.get();
@@ -126,11 +126,11 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
         dismissProgressDialog();
     }
 
-    /**
+    *//**
      * 将onNext方法中的返回结果交给Activity或Fragment自己处理
      *
      * @param t 创建Subscriber时的泛型类型
-     */
+     *//*
     @Override
     public void onNext(T t) {
         if (mOnNext != null) {
@@ -138,12 +138,12 @@ public class ProgressSubscriber<T> extends Subscriber<T> {
         }
     }
 
-    /**
+    *//**
      * 取消ProgressDialog的时候，取消对observable的订阅，同时也取消了http请求
-     */
+     *//*
     public void onCancelProgress() {
         if (!this.isUnsubscribed()) {
             this.unsubscribe();
         }
     }
-}
+}*/

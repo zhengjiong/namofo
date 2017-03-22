@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
-import com.namofo.radio.ui.base.BaseFragment;
+import com.namofo.radio.ui.base.RxFragment;
 
 /**
  * Title: UserCenterFragment
@@ -19,7 +19,7 @@ import com.namofo.radio.ui.base.BaseFragment;
  * @author 郑炯
  * @version 1.0
  */
-public class UserCenterFragment extends BaseFragment {
+public class UserCenterFragment extends RxFragment {
     private Toolbar mToolbar;
     public static UserCenterFragment newInstance() {
 

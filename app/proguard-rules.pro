@@ -40,3 +40,9 @@ public static java.lang.String TABLENAME;
 # If you do not use Rx:
 -dontwarn rx.**
 #--------------------------------------greendao  end-------------------------------
+
+
+#--------------------------------------七牛云直播 start------------------------------
+-keep class com.pili.pldroid.player.** { *; }
+-keep class tv.danmaku.ijk.media.player.** {*;}
+#--------------------------------------七牛云直播 end------------------------------

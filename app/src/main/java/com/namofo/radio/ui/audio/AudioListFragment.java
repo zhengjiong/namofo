@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 
 import com.chanven.lib.cptr.PtrDefaultHandler;
 import com.chanven.lib.cptr.PtrFrameLayout;
+import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
 import com.namofo.radio.adapter.AudioListAdapter;
-import com.namofo.radio.base.MyRecyclerAdapterWithHF;
+import com.namofo.radio.base.BaseSwipeBackFragment;
 import com.namofo.radio.common.IntentKey;
 import com.namofo.radio.presenter.AudioListPresenter;
-import com.namofo.radio.ui.base.BaseFragment;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
@@ -33,7 +33,7 @@ import butterknife.ButterKnife;
  * @author 郑炯
  * @version 1.0
  */
-public class AudioListFragment extends BaseFragment {
+public class AudioListFragment extends BaseSwipeBackFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -44,41 +44,48 @@ public class AudioListFragment extends BaseFragment {
     CustomPtrFrameLayout mPtrFrameLayout;
 
     private int mAlbumId;
+    private String albumName;
+
     private AudioListPresenter mPresenter;
     private AudioListAdapter mAdapter;
 
 
 
-    public static AudioListFragment newInstance(int albumId) {
+    public static AudioListFragment newInstance(int albumId, String albumName) {
 
         Bundle args = new Bundle();
 
         AudioListFragment fragment = new AudioListFragment();
         fragment.setArguments(args);
         args.putInt(IntentKey.KEY_ALBUM_ID, albumId);
+        args.putString(IntentKey.KEY_TITLE, albumName);
         return fragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mAlbumId = savedInstanceState.getInt(IntentKey.KEY_ALBUM_ID, 0);
+            albumName = savedInstanceState.getString(IntentKey.KEY_TITLE, getString(R.string.tab_record));
+        } else {
+            mAlbumId = getArguments().getInt(IntentKey.KEY_ALBUM_ID, 0);
+            albumName = getArguments().getString(IntentKey.KEY_TITLE, getString(R.string.tab_record));
+        }
         View view = inflater.inflate(R.layout.fragment_album_layout, container, false);
         ButterKnife.bind(this, view);
+        initToolbar(mToolbar, albumName);
         initView();
-        return view;
+        return attachToSwipeBack(view);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            mAlbumId = savedInstanceState.getInt(IntentKey.KEY_ALBUM_ID, 0);
-        } else {
-            mAlbumId = getArguments().getInt(IntentKey.KEY_ALBUM_ID, 0);
-        }
+
         mAdapter = new AudioListAdapter();
         mPresenter = new AudioListPresenter();
-        mRecyclerView.setAdapter(new MyRecyclerAdapterWithHF(mAdapter));
+        mRecyclerView.setAdapter(new RecyclerAdapterWithHF(mAdapter));
 
 
         mPtrFrameLayout.postDelayed(() -> {
@@ -87,7 +94,6 @@ public class AudioListFragment extends BaseFragment {
     }
 
     private void initView() {
-        mToolbar.setTitle(R.string.tab_record);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 

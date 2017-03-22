@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 
 import com.chanven.lib.cptr.PtrDefaultHandler;
 import com.chanven.lib.cptr.PtrFrameLayout;
+import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.namofo.radio.R;
 import com.namofo.radio.adapter.AlbumListAdapter;
-import com.namofo.radio.base.MyRecyclerAdapterWithHF;
 import com.namofo.radio.presenter.AlbumPresenter;
-import com.namofo.radio.ui.base.BaseFragment;
+import com.namofo.radio.ui.base.RxFragment;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
  * @author 郑炯
  * @version 1.0
  */
-public class AlbumListFragment extends BaseFragment {
+public class AlbumListFragment extends RxFragment {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.recyclerview)
@@ -72,7 +72,8 @@ public class AlbumListFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         mPresenter = new AlbumPresenter();
         mAdapter = new AlbumListAdapter(this);
-        mRecyclerView.setAdapter(new MyRecyclerAdapterWithHF(mAdapter));
+        RecyclerAdapterWithHF adapter = new RecyclerAdapterWithHF(mAdapter);
+        mRecyclerView.setAdapter(adapter);
         /*OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS);

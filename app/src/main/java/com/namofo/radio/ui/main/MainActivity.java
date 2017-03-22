@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.namofo.radio.R;
-import com.namofo.radio.ui.base.BaseActivity;
+import com.namofo.radio.ui.base.RxActivity;
 
 import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.fragmentation.helper.FragmentLifecycleCallbacks;
@@ -17,7 +17,7 @@ import me.yokeyword.fragmentation.helper.FragmentLifecycleCallbacks;
  * @version 1.0
  */
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends RxActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

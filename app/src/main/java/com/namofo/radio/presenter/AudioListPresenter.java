@@ -2,14 +2,14 @@ package com.namofo.radio.presenter;
 
 import android.view.View;
 
-import com.namofo.radio.entity.Album;
 import com.namofo.radio.entity.Audio;
 import com.namofo.radio.exception.HttpException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
+
 
 /**
  * Title: MeiZhiPresenter
@@ -22,17 +22,17 @@ import rx.functions.Action1;
 public class AudioListPresenter extends BasePresenter<View> {
     private int page = 1;
 
-    public void refresh(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
+    public void refresh(int album, Consumer<List<Audio>> onNext, Consumer<String> onError) {
         page = 1;
         loadData(album, onNext, onError);
     }
 
-    public void loadMore(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
+    public void loadMore(int album, Consumer<List<Audio>> onNext, Consumer<String> onError) {
         page++;
         loadData(album, onNext, onError);
     }
 
-    private void loadData(int album, Action1<List<Audio>> onNext, Action1<String> onError) {
+    private void loadData(int album, Consumer<List<Audio>> onNext, Consumer<String> onError) {
         submitRequest(getHttpService().getAudio(album+""), responseEntity -> {
             if (responseEntity.error) {
                 throw new HttpException(responseEntity.message);
@@ -40,8 +40,8 @@ public class AudioListPresenter extends BasePresenter<View> {
             if (responseEntity.result == null) {
                 responseEntity.result = new ArrayList<>();
             }
-            onNext.call(responseEntity.result);
-        }, throwable -> onError.call(throwable.getMessage()));
+            onNext.accept(responseEntity.result);
+        }, throwable -> onError.accept(throwable.getMessage()));
     }
 
 

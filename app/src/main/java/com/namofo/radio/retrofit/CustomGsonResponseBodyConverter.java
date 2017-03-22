@@ -5,7 +5,14 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.orhanobut.logger.Logger;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -30,12 +37,27 @@ final class CustomGsonResponseBodyConverter<T> implements Converter<ResponseBody
     }
 
     @Override public T convert(ResponseBody value) throws IOException {
-        JsonReader jsonReader = gson.newJsonReader(value.charStream());
         try {
-            Logger.i(jsonReader.toString());
-            T read = adapter.read(jsonReader);
-            read.toString();
-            return read;
+            String json = value.string();
+            Logger.i(json);
+            /*JSONArray results = object.getJSONArray("results");
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(results.toString().getBytes());;
+            if (object.toString().contains("results\":[")) {//原谅我,fastJson和gson都试过了,都不行,只能写死了
+
+
+            } else if (object.toString().contains("results\":{")) {
+
+                JSONObject results = object.getJSONObject("results");
+                //将字符串转换成输入流
+                inputStream = new ByteArrayInputStream(results.toString().getBytes());
+            } else {
+                //随便抛个异常的,请自动忽略
+                throw new RuntimeException("Port Exception");
+            }*/
+            //字节流转换成字符流
+            Reader reader = new InputStreamReader(new ByteArrayInputStream(json.getBytes()));
+            JsonReader jsonReader = gson.newJsonReader(reader);
+            return adapter.read(jsonReader);
         } finally {
             value.close();
         }

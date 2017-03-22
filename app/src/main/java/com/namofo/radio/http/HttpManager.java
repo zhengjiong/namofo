@@ -9,13 +9,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -36,11 +32,10 @@ public class HttpManager {
     private HttpService httpService;
 
     private HttpManager() {
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        /*HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);*/
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .addInterceptor(new LoggingInterceptor())
-                //.addInterceptor(loggingInterceptor)
+                //.addInterceptor(new LoggingInterceptor())
                 .connectTimeout(Constants.TIMEOUT, TimeUnit.SECONDS);
 
         Retrofit retrofit = new Retrofit.Builder()

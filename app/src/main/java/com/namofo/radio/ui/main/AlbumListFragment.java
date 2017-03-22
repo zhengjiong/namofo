@@ -70,7 +70,7 @@ public class AlbumListFragment extends RxFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter = new AlbumPresenter();
+        mPresenter = new AlbumPresenter(this);
         mAdapter = new AlbumListAdapter(this);
         RecyclerAdapterWithHF adapter = new RecyclerAdapterWithHF(mAdapter);
         mRecyclerView.setAdapter(adapter);

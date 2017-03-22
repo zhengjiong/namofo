@@ -4,6 +4,9 @@ import android.view.View;
 
 import com.namofo.radio.entity.Audio;
 import com.namofo.radio.exception.HttpException;
+import com.trello.rxlifecycle2.LifecycleProvider;
+import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,10 @@ import io.reactivex.functions.Consumer;
  */
 public class AudioListPresenter extends BasePresenter<View> {
     private int page = 1;
+
+    public AudioListPresenter(LifecycleProvider<FragmentEvent> lifecycleProvider) {
+        super(lifecycleProvider);
+    }
 
     public void refresh(int album, Consumer<List<Audio>> onNext, Consumer<String> onError) {
         page = 1;

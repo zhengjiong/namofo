@@ -84,7 +84,7 @@ public class AudioListFragment extends BaseSwipeBackFragment {
         super.onActivityCreated(savedInstanceState);
 
         mAdapter = new AudioListAdapter();
-        mPresenter = new AudioListPresenter();
+        mPresenter = new AudioListPresenter(this);
         mRecyclerView.setAdapter(new RecyclerAdapterWithHF(mAdapter));
 
 

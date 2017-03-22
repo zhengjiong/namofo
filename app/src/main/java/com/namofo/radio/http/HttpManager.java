@@ -4,6 +4,8 @@ import com.namofo.radio.common.Constants;
 import com.namofo.radio.exception.RetryWhenNetworkException;
 import com.namofo.radio.retrofit.CustomGsonConvertFactor;
 import com.orhanobut.logger.Logger;
+import com.trello.rxlifecycle2.LifecycleProvider;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -60,12 +62,12 @@ public class HttpManager {
         return httpService;
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext) {
+    public <T extends Object> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext) {
         httpObservable
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
                 /*生命周期管理*/
-                //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
+                .compose(lifecycleProvider.bindToLifecycle())
                 /*http请求线程*/
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
@@ -73,12 +75,12 @@ public class HttpManager {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext);
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError) {
+    public <T> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError) {
         httpObservable
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
                 /*生命周期管理*/
-                //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
+                .compose(lifecycleProvider.bindToLifecycle())
                 /*http请求线程*/
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
@@ -86,14 +88,14 @@ public class HttpManager {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext, onError);
     }
 
-    public <T> void doHttp(Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete) {
+    public <T> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete) {
         httpObservable
                 /*结果判断*/
                 //.map(basePostEntity);
                 /*失败后的retry配置*/
                 .retryWhen(new RetryWhenNetworkException())
                 /*生命周期管理*/
-                //.compose(basePostEntity.getRxAppCompatActivity().bindToLifecycle())
+                .compose(lifecycleProvider.bindToLifecycle())
                 /*http请求线程*/
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())

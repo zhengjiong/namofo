@@ -2,6 +2,8 @@ package com.namofo.radio.presenter;
 
 import com.namofo.radio.http.HttpManager;
 import com.namofo.radio.http.HttpService;
+import com.trello.rxlifecycle2.LifecycleProvider;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
@@ -17,23 +19,28 @@ import io.reactivex.functions.Consumer;
  * @author 郑炯
  * @version 1.0
  */
-public abstract class BasePresenter<V> implements Presenter<V>{
+public abstract class BasePresenter<V> implements Presenter<V> {
     HttpManager httpManager = HttpManager.getInstance();
+    LifecycleProvider<?> lifecycleProvider;
 
-    public HttpService getHttpService(){
+    public BasePresenter(LifecycleProvider<?> lifecycleProvider) {
+        this.lifecycleProvider = lifecycleProvider;
+    }
+
+    public HttpService getHttpService() {
         return httpManager.getHttpService();
     }
 
-    public <T> void submitRequest(Observable<T> observable, Consumer<T> onNext){
-        httpManager.doHttp(observable, onNext);
+    public <T> void submitRequest(Observable<T> observable, Consumer<T> onNext) {
+        httpManager.doHttp(lifecycleProvider, observable, onNext);
     }
 
-    public <T> void submitRequest(Observable<T> observable,  Consumer<T> onNext, Consumer<Throwable> onError){
-        httpManager.doHttp(observable, onNext, onError);
+    public <T> void submitRequest(Observable<T> observable, Consumer<T> onNext, Consumer<Throwable> onError) {
+        httpManager.doHttp(lifecycleProvider, observable, onNext, onError);
     }
 
-    public <T> void submitRequest(Observable<T> observable,  Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete){
-        httpManager.doHttp(observable, onNext, onError, onComplete);
+    public <T> void submitRequest(Observable<T> observable, Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete) {
+        httpManager.doHttp(lifecycleProvider, observable, onNext, onError, onComplete);
     }
 
     public void attachView(V mvpView) {

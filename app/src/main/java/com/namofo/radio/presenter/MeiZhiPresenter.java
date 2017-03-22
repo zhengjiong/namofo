@@ -3,6 +3,7 @@ package com.namofo.radio.presenter;
 import com.namofo.radio.entity.MeiZhi;
 import com.namofo.radio.entity.api.BaseResultEntity;
 import com.namofo.radio.exception.HttpException;
+import com.trello.rxlifecycle2.LifecycleProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,10 @@ import io.reactivex.functions.Consumer;
  */
 public class MeiZhiPresenter extends BasePresenter {
     private int page = 1;
+
+    public MeiZhiPresenter(LifecycleProvider lifecycleProvider) {
+        super(lifecycleProvider);
+    }
 
     public void refresh(Consumer<List<MeiZhi>> onNext, Consumer<String> onError){
         page = 1;

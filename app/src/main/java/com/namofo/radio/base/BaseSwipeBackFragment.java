@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.namofo.radio.R;
+import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.LifecycleTransformer;
 import com.trello.rxlifecycle2.RxLifecycle;
 import com.trello.rxlifecycle2.android.FragmentEvent;
@@ -28,7 +29,7 @@ import me.yokeyword.fragmentation_swipeback.SwipeBackFragment;
  * @author 郑炯
  * @version 1.0
  */
-public class BaseSwipeBackFragment extends SwipeBackFragment {
+public class BaseSwipeBackFragment extends SwipeBackFragment implements LifecycleProvider<FragmentEvent> {
     public void initToolbar(Toolbar toolbar, String title) {
         toolbar.setTitle(title);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);

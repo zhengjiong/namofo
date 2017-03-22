@@ -6,6 +6,7 @@ import com.namofo.radio.entity.Album;
 import com.namofo.radio.entity.Audio;
 import com.namofo.radio.entity.api.BaseResultEntity;
 import com.namofo.radio.exception.HttpException;
+import com.trello.rxlifecycle2.LifecycleProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,10 @@ import io.reactivex.functions.Consumer;
  */
 public class AlbumPresenter extends BasePresenter<View> {
     public int page;
+
+    public AlbumPresenter(LifecycleProvider lifecycleProvider) {
+        super(lifecycleProvider);
+    }
 
     public void refresh(Consumer<List<Album>> onNext, Consumer<String> onError) {
         page = 1;

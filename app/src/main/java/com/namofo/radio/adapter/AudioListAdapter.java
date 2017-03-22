@@ -1,12 +1,9 @@
 package com.namofo.radio.adapter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
 import com.namofo.radio.R;
 import com.namofo.radio.base.BaseRecyclerViewAdapter;
-import com.namofo.radio.base.BaseViewHolder;
 import com.namofo.radio.common.Constants;
 import com.namofo.radio.entity.Audio;
 import com.namofo.radio.util.ToastUtils;
@@ -36,6 +33,13 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
     @Override
     public void onBindViewHolder(AudioItemViewHolder holder, int position) {
         Audio audio = getItem(position);
+        if (position == 0) {
+            audio.audio_url = "http://audio.xmcdn.com/group26/M09/40/E6/wKgJWFjNXojitlrpABPwktDPeiM430.m4a";
+        } else if (position == 1) {
+            audio.audio_url = "http://audio.xmcdn.com/group26/M04/72/06/wKgJRljSLbbyNhCsABDiLBsYrB8877.m4a";
+        } else if (position == 2) {
+            audio.audio_url = "http://audio.xmcdn.com/group11/M0B/2B/EB/wKgDa1WJF7uiSZCOACtJAJN7dYU376.m4a";
+        }
         holder.tvNumber.setText(String.valueOf(position + 1));
         holder.title.setText(audio.audio_name);
         holder.tvDate.setText(audio.mdate);

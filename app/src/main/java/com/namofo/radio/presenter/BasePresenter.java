@@ -3,7 +3,6 @@ package com.namofo.radio.presenter;
 import com.namofo.radio.http.HttpManager;
 import com.namofo.radio.http.HttpService;
 import com.trello.rxlifecycle2.LifecycleProvider;
-import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;

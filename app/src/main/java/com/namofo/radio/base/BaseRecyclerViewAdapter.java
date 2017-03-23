@@ -24,9 +24,12 @@ import java.util.List;
  * @version 1.0
  */
 public abstract class BaseRecyclerViewAdapter<T,VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
-
+    public Context mContext;
     private ArrayList<T> mList = new ArrayList<T>();
 
+    public BaseRecyclerViewAdapter(Context context) {
+        this.mContext = context;
+    }
     @Override
     public int getItemCount() {
         return mList == null ? 0 : mList.size();

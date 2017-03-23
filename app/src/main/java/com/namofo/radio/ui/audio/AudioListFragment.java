@@ -1,5 +1,8 @@
 package com.namofo.radio.ui.audio;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +20,8 @@ import com.namofo.radio.adapter.AudioListAdapter;
 import com.namofo.radio.base.BaseSwipeBackFragment;
 import com.namofo.radio.common.IntentKey;
 import com.namofo.radio.presenter.AudioListPresenter;
+import com.namofo.radio.service.AudioPlayer;
+import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.view.CustomPtrFrameLayout;
 
@@ -48,6 +53,7 @@ public class AudioListFragment extends BaseSwipeBackFragment {
 
     private AudioListPresenter mPresenter;
     private AudioListAdapter mAdapter;
+    private PlayerService mPlayerService;
 
 
 
@@ -83,7 +89,7 @@ public class AudioListFragment extends BaseSwipeBackFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mAdapter = new AudioListAdapter();
+        mAdapter = new AudioListAdapter(getContext());
         mPresenter = new AudioListPresenter(this);
         mRecyclerView.setAdapter(new RecyclerAdapterWithHF(mAdapter));
 
@@ -129,4 +135,5 @@ public class AudioListFragment extends BaseSwipeBackFragment {
             mPtrFrameLayout.loadMoreComplete(false);
         });
     }
+
 }

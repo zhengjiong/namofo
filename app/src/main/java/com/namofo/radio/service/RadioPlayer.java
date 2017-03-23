@@ -330,6 +330,10 @@ public class RadioPlayer {
         this.mLoadingListener = loadingListener;
     }
 
+    public IOnLoadingListener getLoadingListener() {
+        return mLoadingListener;
+    }
+
     public boolean isPlaying(){
         if (mPLMediaPlayer != null && mPLMediaPlayer.isPlaying()) {
             return true;

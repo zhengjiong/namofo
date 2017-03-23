@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.namofo.radio.R;
+import com.namofo.radio.event.PlayEvent;
 import com.namofo.radio.service.AudioPlayer;
 import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.service.RadioPlayer;
@@ -26,6 +27,8 @@ import com.namofo.radio.util.ErrorDialogUtils;
 import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.view.RotatePlayView;
 import com.namofo.radio.view.playerview.MusicPlayerView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -68,8 +71,6 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
     @BindView(R.id.rotate_play_view)
     RotatePlayView mRotatePlayView;
 
-    private PlayerService mPlayerService;
-
     public static RadioFragment newInstance() {
 
         Bundle args = new Bundle();
@@ -99,7 +100,7 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         RxView.clicks(btnStart)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)//两秒钟之内只取一个点击事件，防抖操作
                 .subscribe(aVoid -> {
-                    startRadioService(RadioPlayer.RADIO_PLAY_ACTION, mConnection, null);
+                    EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_PLAY_ACTION));
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -126,46 +127,7 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         RxView.clicks(btnStop)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)
                 .subscribe(aVoid -> {
-                    startRadioService(RadioPlayer.RADIO_STOP_ACTION, mConnection, null);
-                }, throwable -> {
-                    ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
-                });
-
-        RxView.clicks(btnTestStart)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        startRadioService(
-                                AudioPlayer.AUDIO_PLAY_ACTION,
-                                mConnection,
-                                "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a"
-                        );
-                    }
-                }, throwable -> {
-                    ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
-                });
-        RxView.clicks(btnTestPause)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        startRadioService(AudioPlayer.AUDIO_PAUSE_ACTION, mConnection, null);
-                    }
-                }, throwable -> {
-                    ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
-                });
-        RxView.clicks(btnTestResume)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        startRadioService(AudioPlayer.AUDIO_RESUME_ACTION, mConnection, null);
-                    }
-                });
-        RxView.clicks(btnTestStop)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        startRadioService(AudioPlayer.AUDIO_STOP_ACTION, mConnection, null);
-                    }
+                    EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_STOP_ACTION));
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -182,57 +144,14 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         });
     }
 
-    private void startRadioService(String action, ServiceConnection mConnection, String dataSource) {
-        Intent intent = new Intent(getActivity(), PlayerService.class);
-        intent.setAction(action);
-        if (dataSource != null) {
-            intent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, dataSource);
-        }
-        getContext().startService(intent);
-        if (mPlayerService == null) {
-            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        startRadioService(RadioPlayer.RADIO_PLAY_ACTION, mConnection, null);
+        EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_PLAY_ACTION, null));
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the service object we can use to
-            // interact with the service.  Because we have bound to a explicit
-            // service that we know is running in our own process, we can
-            // cast its IBinder to a concrete class and directly access it.
-            LogUtils.sout("onServiceConnected");
-            mPlayerService = ((PlayerService.RadioBinder) service).getService();
-            if (mPlayerService != null) {
-                mPlayerService.getRadioPlayer().setLoadingListener(RadioFragment.this);
-                if (mPlayerService.getRadioPlayer().isPlaying()) {
-                    onRadioPlay();
-                }
-            }
-            getContext().unbindService(this);
-            //mView.onPlaybackServiceBound(mPlaybackService);
-            //mView.onSongUpdated(mPlaybackService.getPlayingSong());
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            // Because it is running in our same process, we should never
-            // see this happen.
-            LogUtils.sout("onServiceDisconnected");
-            if (mPlayerService != null) {
-                mPlayerService.getRadioPlayer().setLoadingListener(null);
-                mPlayerService = null;
-            }
-        }
-    };
 
     @Override
     public void onRadioLoading() {
@@ -266,8 +185,9 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
     @Override
     public void onDetach() {
         super.onDetach();
-        if (mPlayerService != null) {
+        // TODO: 17/3/23 17:52 zhengjiong
+        /*if (mPlayerService != null) {
             mPlayerService.getRadioPlayer().setLoadingListener(null);
-        }
+        }*/
     }
 }

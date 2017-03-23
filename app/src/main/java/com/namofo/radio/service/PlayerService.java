@@ -85,15 +85,15 @@ public class PlayerService extends Service {
                 notifyAudioStop();
             } else if (RadioPlayer.RADIO_CLOSE_ACTION.equals(action)) {
                 mRadioPlayer.release();
-                if (!mAudioPlayer.isPlaying()) {
+                //if (!mAudioPlayer.isPlaying()) {
                     stopForeground(false);
-                }
+                //}
                 mNotificationManager.cancel(MediaNotificationUtils.NOTIFICATION_ID_RADIO);
             } else if (AudioPlayer.AUDIO_CLOSE_ACTION.equals(action)) {
                 mAudioPlayer.release();
-                if (!mRadioPlayer.isPlaying()) {
+                //if (!mRadioPlayer.isPlaying()) {
                     stopForeground(false);
-                }
+                //}
                 mNotificationManager.cancel(MediaNotificationUtils.NOTIFICATION_ID_AUDIO);
             }
 

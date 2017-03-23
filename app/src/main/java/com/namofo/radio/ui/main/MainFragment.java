@@ -1,20 +1,33 @@
 package com.namofo.radio.ui.main;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
+import com.namofo.radio.event.PlayEvent;
+import com.namofo.radio.service.AudioPlayer;
+import com.namofo.radio.service.PlayerService;
+import com.namofo.radio.ui.base.EventFragment;
 import com.namofo.radio.ui.base.RxFragment;
 import com.namofo.radio.event.StartBrotherEvent;
 import com.namofo.radio.event.TabSelectedEvent;
+import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.view.BottomBar;
 import com.namofo.radio.view.BottomBarTab;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Description: 首页
@@ -24,7 +37,7 @@ import org.greenrobot.eventbus.Subscribe;
  * @author 郑炯
  * @version 1.0
  */
-public class MainFragment extends RxFragment {
+public class MainFragment extends EventFragment {
     public static final int FIRST = 0;
     public static final int SECOND = 1;
     public static final int THIRD = 2;
@@ -33,6 +46,8 @@ public class MainFragment extends RxFragment {
     private RxFragment mFragments[] = new RxFragment[4];
 
     private BottomBar mBottomBar;
+
+    private PlayerService mPlayerService;
 
     public static MainFragment newInstance() {
 
@@ -68,7 +83,6 @@ public class MainFragment extends RxFragment {
             mFragments[FOUR] = findChildFragment(UserCenterFragment.class);
         }
         initView(view);
-        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -116,6 +130,11 @@ public class MainFragment extends RxFragment {
         start(event.targetFragment);
     }
 
+    @Subscribe
+    public void onEventMainThread(PlayEvent event){
+        startPlayService(event.action, event.dataSource);
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -126,10 +145,58 @@ public class MainFragment extends RxFragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    @Override
-    public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroyView();
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            LogUtils.sout("onServiceConnected");
+            mPlayerService = ((PlayerService.RadioBinder) service).getService();
+            if (mPlayerService != null) {
+                SupportFragment supportFragment = findChildFragment(RadioFragment.class);
+                if (supportFragment != null && supportFragment instanceof RadioFragment) {
+                    mPlayerService.getRadioPlayer().setLoadingListener(((RadioFragment) supportFragment));
+                }
+                if (mPlayerService.getRadioPlayer().isPlaying()) {
+                    if (mPlayerService.getRadioPlayer().getLoadingListener() != null) {
+                        mPlayerService.getRadioPlayer().getLoadingListener().onRadioPlay();
+                    }
+                } else {
+                    if (mPlayerService.getRadioPlayer().getLoadingListener() != null) {
+                        mPlayerService.getRadioPlayer().getLoadingListener().onRadioStop();
+                    }
+                }
+            }
+            getContext().unbindService(this);
+            //mView.onPlaybackServiceBound(mPlaybackService);
+            //mView.onSongUpdated(mPlaybackService.getPlayingSong());
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            LogUtils.sout("onServiceDisconnected");
+            if (mPlayerService != null) {
+                mPlayerService.getRadioPlayer().setLoadingListener(null);
+                mPlayerService = null;
+            }
+        }
+    };
+
+    private void startPlayService(String action, String dataSource) {
+        Intent intent = new Intent(getActivity(), PlayerService.class);
+        intent.setAction(action);
+        if (!TextUtils.isEmpty(dataSource)) {
+            intent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, dataSource);
+        }
+        getContext().startService(intent);
+        if (mPlayerService == null) {
+            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
 }

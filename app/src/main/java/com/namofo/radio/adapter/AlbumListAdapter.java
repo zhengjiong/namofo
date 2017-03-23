@@ -1,5 +1,6 @@
 package com.namofo.radio.adapter;
 
+import android.content.Context;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
@@ -24,7 +25,8 @@ import org.greenrobot.eventbus.EventBus;
 public class AlbumListAdapter<VH extends RecordAlbumViewHolder> extends BaseRecyclerViewAdapter<Album, VH> {
     private RxFragment fragment;
 
-    public AlbumListAdapter(RxFragment fragment) {
+    public AlbumListAdapter(Context context, RxFragment fragment) {
+        super(context);
         this.fragment = fragment;
     }
 

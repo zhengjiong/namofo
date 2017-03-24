@@ -1,18 +1,18 @@
 package com.namofo.radio.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
 import com.namofo.radio.base.BaseRecyclerViewAdapter;
 import com.namofo.radio.common.Constants;
 import com.namofo.radio.entity.Audio;
+import com.namofo.radio.event.AudioPlayEvent;
 import com.namofo.radio.service.AudioPlayer;
-import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.viewholder.AudioItemViewHolder;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,13 +58,11 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
         holder.tvDate.setText(audio.mdate);
         holder.tvTime.setText(simpleDateFormat.format(new Date(audio.audio_second)));
 
-        /*holder.itemView.setOnClickListener(v -> {
-            startRadioService(
-                    AudioPlayer.AUDIO_PLAY_ACTION,
-                    mConnection,
-                    udio.audio_url
-            );
-        });*/
+        holder.itemView.setOnClickListener(v -> {
+            Audio playAudio = getItem(holder.getAdapterPosition());
+            EventBus.getDefault().post(new AudioPlayEvent(AudioPlayer.AUDIO_PLAY_ACTION, playAudio.audio_name, "讲师A",playAudio.audio_url));
+            ToastUtils.showShort(mContext, R.string.text_play_start);
+        });
     }
 
 

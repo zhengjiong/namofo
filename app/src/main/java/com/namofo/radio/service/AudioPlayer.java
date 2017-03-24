@@ -3,6 +3,7 @@ package com.namofo.radio.service;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.support.annotation.StringDef;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.namofo.radio.R;
@@ -10,6 +11,8 @@ import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.util.ToastUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Title: AudioPlayer
@@ -30,7 +33,10 @@ public class AudioPlayer {
     public static final String AUDIO_STOP_ACTION = "com.namofo.audio.stop";
     public static final String AUDIO_CLOSE_ACTION = "com.namofo.audio.close";
 
-    public static final String EXTRA_NAME_AUDIO_DATA_SOURCE = "extra_audio_data_source";
+    @StringDef({AUDIO_PLAY_ACTION, AUDIO_PAUSE_ACTION, AUDIO_RESUME_ACTION, AUDIO_STOP_ACTION, AUDIO_CLOSE_ACTION})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface AudioPlayAction{}
+
     //mMediaPlayer.setDataSource("http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
     //mMediaPlayer.setDataSource("rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583");
 

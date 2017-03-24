@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
-import com.namofo.radio.event.PlayEvent;
-import com.namofo.radio.service.AudioPlayer;
+import com.namofo.radio.common.IntentKey;
+import com.namofo.radio.event.AudioPlayEvent;
+import com.namofo.radio.event.RadioPlayEvent;
+import com.namofo.radio.event.RadioPlayStatusEvent;
 import com.namofo.radio.service.PlayerService;
 import com.namofo.radio.ui.base.EventFragment;
 import com.namofo.radio.ui.base.RxFragment;
@@ -26,8 +28,6 @@ import com.namofo.radio.view.BottomBarTab;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Description: 首页
@@ -131,8 +131,13 @@ public class MainFragment extends EventFragment {
     }
 
     @Subscribe
-    public void onEventMainThread(PlayEvent event){
-        startPlayService(event.action, event.dataSource);
+    public void onEventMainThread(AudioPlayEvent event) {
+        startAudio(event.action, event.title, event.text, event.dataSource);
+    }
+
+    @Subscribe
+    public void onEventMainThread(RadioPlayEvent event) {
+        startRadio(event.action);
     }
 
     @Override
@@ -154,7 +159,7 @@ public class MainFragment extends EventFragment {
             // cast its IBinder to a concrete class and directly access it.
             LogUtils.sout("onServiceConnected");
             mPlayerService = ((PlayerService.RadioBinder) service).getService();
-            if (mPlayerService != null) {
+            /*if (mPlayerService != null) {
                 SupportFragment supportFragment = findChildFragment(RadioFragment.class);
                 if (supportFragment != null && supportFragment instanceof RadioFragment) {
                     mPlayerService.getRadioPlayer().setLoadingListener(((RadioFragment) supportFragment));
@@ -168,8 +173,8 @@ public class MainFragment extends EventFragment {
                         mPlayerService.getRadioPlayer().getLoadingListener().onRadioStop();
                     }
                 }
-            }
-            getContext().unbindService(this);
+            }*/
+            getContext().unbindService(this);//拿到service对象后解绑该fragment
             //mView.onPlaybackServiceBound(mPlaybackService);
             //mView.onSongUpdated(mPlaybackService.getPlayingSong());
         }
@@ -181,22 +186,32 @@ public class MainFragment extends EventFragment {
             // see this happen.
             LogUtils.sout("onServiceDisconnected");
             if (mPlayerService != null) {
-                mPlayerService.getRadioPlayer().setLoadingListener(null);
                 mPlayerService = null;
+                EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.STOPED));
             }
         }
     };
 
-    private void startPlayService(String action, String dataSource) {
+    private void startRadio(String action) {
         Intent intent = new Intent(getActivity(), PlayerService.class);
         intent.setAction(action);
-        if (!TextUtils.isEmpty(dataSource)) {
-            intent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, dataSource);
-        }
         getContext().startService(intent);
         if (mPlayerService == null) {
             getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
     }
+
+    private void startAudio(String action, String title, String text, String dataSource) {
+        Intent intent = new Intent(getActivity(), PlayerService.class);
+        intent.setAction(action);
+        intent.putExtra(IntentKey.KEY_AUDIO_DATA_SOURCE, dataSource);
+        intent.putExtra(IntentKey.KEY_TITLE, title);
+        intent.putExtra(IntentKey.KEY_TEXT, text);
+        getContext().startService(intent);
+        if (mPlayerService == null) {
+            getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
 
 }

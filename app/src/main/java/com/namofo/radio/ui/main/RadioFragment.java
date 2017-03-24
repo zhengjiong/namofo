@@ -1,12 +1,8 @@
 package com.namofo.radio.ui.main;
 
 import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
@@ -18,23 +14,22 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.namofo.radio.R;
-import com.namofo.radio.event.PlayEvent;
-import com.namofo.radio.service.AudioPlayer;
-import com.namofo.radio.service.PlayerService;
+import com.namofo.radio.event.AudioPlayEvent;
+import com.namofo.radio.event.RadioPlayEvent;
+import com.namofo.radio.event.RadioPlayStatusEvent;
 import com.namofo.radio.service.RadioPlayer;
-import com.namofo.radio.ui.base.RxFragment;
+import com.namofo.radio.ui.base.EventFragment;
 import com.namofo.radio.util.ErrorDialogUtils;
-import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.view.RotatePlayView;
 import com.namofo.radio.view.playerview.MusicPlayerView;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.functions.Consumer;
 
 /**
  * Description: 直播
@@ -43,7 +38,7 @@ import io.reactivex.functions.Consumer;
  * @author 郑炯
  * @version 1.0
  */
-public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingListener {
+public class RadioFragment extends EventFragment {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -55,15 +50,6 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
     View loadView;
     @BindView(R.id.txt_playing)
     TextView txtPlaying;
-
-    @BindView(R.id.btn_test_start)
-    Button btnTestStart;
-    @BindView(R.id.btn_test_pause)
-    Button btnTestPause;
-    @BindView(R.id.btn_test_resume)
-    Button btnTestResume;
-    @BindView(R.id.btn_test_stop)
-    Button btnTestStop;
 
     @BindView(R.id.music_player_view)
     MusicPlayerView mMusicPlayerView;
@@ -89,10 +75,6 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         return view;
     }
 
-    private NotificationCompat.Action generateAction(int icon) {
-        return new NotificationCompat.Action(icon, "actionTitle", PendingIntent.getBroadcast(getContext(), 0, new Intent(getContext(), MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT));
-    }
-
     private void initView(View view) {
         toolbar.setTitle(R.string.tab_radio);
         mRotatePlayView.setImageView(R.drawable.audio);
@@ -100,7 +82,7 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         RxView.clicks(btnStart)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)//两秒钟之内只取一个点击事件，防抖操作
                 .subscribe(aVoid -> {
-                    EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_PLAY_ACTION));
+                    EventBus.getDefault().post(new RadioPlayEvent(RadioPlayer.RADIO_PLAY_ACTION));
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -127,7 +109,7 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
         RxView.clicks(btnStop)
                 .throttleFirst(2000, TimeUnit.MILLISECONDS)
                 .subscribe(aVoid -> {
-                    EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_STOP_ACTION));
+                    EventBus.getDefault().post(new RadioPlayEvent(RadioPlayer.RADIO_STOP_ACTION));
                 }, throwable -> {
                     ErrorDialogUtils.showErrorDialog(getContext(), throwable.getMessage());
                 });
@@ -149,45 +131,33 @@ public class RadioFragment extends RxFragment implements RadioPlayer.IOnLoadingL
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        EventBus.getDefault().post(new PlayEvent(RadioPlayer.RADIO_PLAY_ACTION, null));
+        EventBus.getDefault().post(new RadioPlayEvent(RadioPlayer.RADIO_PLAY_ACTION));
     }
 
+    @Subscribe
+    public void onEventMainThread(RadioPlayStatusEvent event){
+        switch (event.playStatus) {
+            case RadioPlayStatusEvent.LOADING:
+                loadView.setVisibility(View.VISIBLE);
+                txtPlaying.setVisibility(View.GONE);
+                break;
+            case RadioPlayStatusEvent.PLAYING:
+                loadView.setVisibility(View.GONE);
+                txtPlaying.setVisibility(View.VISIBLE);
+                txtPlaying.setText(R.string.playing);
+                mRotatePlayView.start();
+                mMusicPlayerView.postDelayed(() -> mMusicPlayerView.start(), 700);
+                break;
+            case RadioPlayStatusEvent.STOPED:
+                loadView.setVisibility(View.GONE);
+                txtPlaying.setVisibility(View.VISIBLE);
+                txtPlaying.setText(R.string.stopped);
+                mMusicPlayerView.stop();
+                mRotatePlayView.stop();
+                break;
+            default:
 
-    @Override
-    public void onRadioLoading() {
-        loadView.setVisibility(View.VISIBLE);
-        txtPlaying.setVisibility(View.GONE);
+        }
     }
 
-    @Override
-    public void onRadioPlay() {
-        loadView.setVisibility(View.GONE);
-        txtPlaying.setVisibility(View.VISIBLE);
-        txtPlaying.setText(R.string.playing);
-        mRotatePlayView.start();
-        mMusicPlayerView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mMusicPlayerView.start();
-            }
-        }, 700);
-    }
-
-    @Override
-    public void onRadioStop() {
-        loadView.setVisibility(View.GONE);
-        txtPlaying.setVisibility(View.VISIBLE);
-        txtPlaying.setText(R.string.stopped);
-        mMusicPlayerView.stop();
-        mRotatePlayView.stop();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        // TODO: 17/3/23 17:52 zhengjiong
-        /*if (mPlayerService != null) {
-            mPlayerService.getRadioPlayer().setLoadingListener(null);
-        }*/
-    }
 }

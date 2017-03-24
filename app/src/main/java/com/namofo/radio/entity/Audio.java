@@ -1,5 +1,7 @@
 package com.namofo.radio.entity;
 
+import android.support.annotation.Keep;
+
 /**
  * Title: Audio
  * Description:
@@ -28,7 +30,7 @@ public class Audio {
     public String remark;
     public int audio_second;
     public String audio_url;
-    public int audio_size;
+    public float audio_size;
     public String audio_name;
     public int albumid;
 }

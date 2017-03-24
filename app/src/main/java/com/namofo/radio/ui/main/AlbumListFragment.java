@@ -1,6 +1,7 @@
 package com.namofo.radio.ui.main;
 
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -129,6 +130,7 @@ public class AlbumListFragment extends RxFragment {
 
     private void refresh() {
         mPresenter.refresh(recordAlba -> {
+            System.out.println("---------------------------------->recordAlba" + recordAlba.size());
             mAdapter.setData(recordAlba);
             mPtrFrameLayout.refreshComplete();
             //mPtrFrameLayout.setLoadMoreEnable(recordAlba.size() != 0);//是否需要加载更多

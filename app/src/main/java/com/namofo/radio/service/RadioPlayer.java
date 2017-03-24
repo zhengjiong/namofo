@@ -1,21 +1,29 @@
 package com.namofo.radio.service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationManagerCompat;
+import android.support.annotation.StringDef;
+import android.text.TextUtils;
 
 import com.namofo.radio.R;
+import com.namofo.radio.common.IntentKey;
+import com.namofo.radio.event.RadioPlayStatusEvent;
 import com.namofo.radio.util.LogUtils;
 import com.namofo.radio.util.ToastUtils;
 import com.namofo.radio.util.Utils;
 import com.pili.pldroid.player.AVOptions;
 import com.pili.pldroid.player.PLMediaPlayer;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Title: RadioPlayer
@@ -43,18 +51,12 @@ public class RadioPlayer {
     public static final String RADIO_STOP_ACTION = "com.namofo.radio.stop";
     public static final String RADIO_CLOSE_ACTION = "com.namofo.radio.close";
 
+    @StringDef({RADIO_PLAY_ACTION,RADIO_STOP_ACTION,RADIO_CLOSE_ACTION})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface RadioPlayAction{}
+
     private static final int MESSAGE_WHAT_ID_RECONNECTING = 0x1;//重新连接
     private static final int RECONNECT_DELAY_MILLIS = 3000;//重连延迟时间
-
-    private IOnLoadingListener mLoadingListener;
-
-    public interface IOnLoadingListener {
-        void onRadioLoading();
-
-        void onRadioPlay();
-
-        void onRadioStop();
-    }
 
     public RadioPlayer(PlayerService service) {
         mService = service;
@@ -175,15 +177,11 @@ public class RadioPlayer {
             LogUtils.sout("mOnInfoListener what = " + what + ", extra = " + extra);
             switch (what) {
                 case PLMediaPlayer.MEDIA_INFO_BUFFERING_START:
-                    if (mLoadingListener != null) {
-                        mLoadingListener.onRadioLoading();
-                    }
+                    EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.LOADING));
                     break;
                 case PLMediaPlayer.MEDIA_INFO_BUFFERING_END:
                 case PLMediaPlayer.MEDIA_INFO_AUDIO_RENDERING_START:
-                    if (mLoadingListener != null) {
-                        mLoadingListener.onRadioPlay();
-                    }
+                    EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.PLAYING));
                     mService.notifyRadioPlay();
                     break;
                 case PLMediaPlayer.MEDIA_INFO_SWITCHING_SW_DECODE:
@@ -284,11 +282,7 @@ public class RadioPlayer {
 
     private void sendReconnectMessage() {
         //ToastUtils.showShort(mService, R.string.re_connect);
-        if (mLoadingListener != null) {
-            mLoadingListener.onRadioLoading();
-            //loadView.setVisibility(View.VISIBLE);
-            //txtPlaying.setVisibility(View.GONE);
-        }
+        EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.LOADING));
         mHandler.removeCallbacksAndMessages(null);
         mHandler.sendMessageDelayed(mHandler.obtainMessage(MESSAGE_WHAT_ID_RECONNECTING), RECONNECT_DELAY_MILLIS);
     }
@@ -326,14 +320,6 @@ public class RadioPlayer {
         ToastUtils.showShort(mService, message);
     }
 
-    public void setLoadingListener(IOnLoadingListener loadingListener) {
-        this.mLoadingListener = loadingListener;
-    }
-
-    public IOnLoadingListener getLoadingListener() {
-        return mLoadingListener;
-    }
-
     public boolean isPlaying(){
         if (mPLMediaPlayer != null && mPLMediaPlayer.isPlaying()) {
             return true;
@@ -348,9 +334,7 @@ public class RadioPlayer {
         }
         mIsStopped = true;
         mPLMediaPlayer = null;
-        if (mLoadingListener != null) {
-            mLoadingListener.onRadioStop();
-        }
+        EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.STOPED));
 
         mHandler.removeCallbacksAndMessages(null);
     }
@@ -368,17 +352,13 @@ public class RadioPlayer {
     public void play(){
         if (mIsStopped) {
             LogUtils.sout("mIsStopped = true");
-            if (mLoadingListener != null) {
-                mLoadingListener.onRadioLoading();
-            }
+            EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.LOADING));
             prepare();
         } else {
             if (mIsPrepared) {
                 LogUtils.sout("mIsPrepared = true");
                 if (mPLMediaPlayer.isPlaying()) {
-                    if (mLoadingListener != null) {
-                        mLoadingListener.onRadioPlay();
-                    }
+                    EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.PLAYING));
                 } else {
                     mPLMediaPlayer.start();
                 }
@@ -386,6 +366,5 @@ public class RadioPlayer {
                 prepare();
             }
         }
-
     }
 }

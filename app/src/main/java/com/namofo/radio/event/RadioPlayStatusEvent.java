@@ -1,5 +1,11 @@
 package com.namofo.radio.event;
 
+import android.support.annotation.StringDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+
 /**
  * Title: RadioPlayStatusEvent
  * Description:
@@ -11,9 +17,27 @@ package com.namofo.radio.event;
  * @version 1.0
  */
 public class RadioPlayStatusEvent {
-    public static final String RADIO_LOADING = "RADIO_LOADING";
-    public static final String RADIO_PLAYING = "RADIO_PLAYING";
-    public static final String RADIO_STOP = "RADIO_STOP";
+    public static final String LOADING = "LOADING";
+    public static final String PLAYING = "PLAYING";
+    public static final String STOPED = "STOPED";
 
+    @StringDef({LOADING, PLAYING, STOPED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface RadioPlayStatus{};
 
+    @RadioPlayStatus
+    public String playStatus;
+
+    public RadioPlayStatusEvent(@RadioPlayStatus String playStatus) {
+        this.playStatus = playStatus;
+    }
+
+    @RadioPlayStatus
+    public String getPlayStatu() {
+        return playStatus;
+    }
+
+    public void setPlayStatu(@RadioPlayStatus String playStatus) {
+        this.playStatus = playStatus;
+    }
 }

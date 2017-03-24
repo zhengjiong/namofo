@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.namofo.radio.R;
 import com.namofo.radio.common.Constants;
+import com.namofo.radio.common.IntentKey;
 import com.namofo.radio.ui.main.MainActivity;
 
 /**
@@ -71,7 +72,7 @@ public class MediaNotificationUtils {
                 .setVisibility(android.support.v7.app.NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentIntent(clickIntent)
                 .setContentTitle("FM直播")
-                .setContentText("清新人生讲堂")
+                .setContentText("凤凰卫视")
                 .setWhen(System.currentTimeMillis())
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)//制定通知的分类
                 //.setCustomBigContentView()//指定展开时的视图
@@ -150,7 +151,7 @@ public class MediaNotificationUtils {
         //txtPlaying.setVisibility(View.VISIBLE);
     }
 
-    public Notification createAudioNotification(boolean isStopped) {
+    public Notification createAudioNotification(boolean isStopped, String title, String text, String dateSource) {
         PendingIntent clickIntent = PendingIntent.getActivity(mContext, 0, new Intent(mContext, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent closeIntent = new Intent(mContext, PlayerService.class);
@@ -159,7 +160,9 @@ public class MediaNotificationUtils {
 
         Intent playIntent = new Intent(mContext, PlayerService.class);
         playIntent.setAction(AudioPlayer.AUDIO_PLAY_ACTION);
-        playIntent.putExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE, "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a");
+        playIntent.putExtra(IntentKey.KEY_TITLE, title);
+        playIntent.putExtra(IntentKey.KEY_TEXT, text);
+        playIntent.putExtra(IntentKey.KEY_AUDIO_DATA_SOURCE, dateSource);
         PendingIntent playPendingIntent = PendingIntent.getService(mContext, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent stopIntent = new Intent(mContext, PlayerService.class);
@@ -180,8 +183,8 @@ public class MediaNotificationUtils {
                  */
                 .setVisibility(android.support.v7.app.NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentIntent(clickIntent)
-                .setContentTitle("录音名")
-                .setContentText("录音作者")
+                .setContentTitle(title)
+                .setContentText(text)
                 //.setWhen(System.currentTimeMillis())
                 //.setCategory(NotificationCompat.CATEGORY_SERVICE)//制定通知的分类
                 //.setCustomBigContentView()//指定展开时的视图

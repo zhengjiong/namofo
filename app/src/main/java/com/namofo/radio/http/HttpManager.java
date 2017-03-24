@@ -1,5 +1,7 @@
 package com.namofo.radio.http;
 
+import android.support.annotation.Keep;
+
 import com.namofo.radio.common.Constants;
 import com.namofo.radio.exception.RetryWhenNetworkException;
 import com.namofo.radio.retrofit.CustomGsonConvertFactor;
@@ -61,7 +63,7 @@ public class HttpManager {
     public HttpService getHttpService() {
         return httpService;
     }
-
+    @Keep
     public <T extends Object> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext) {
         httpObservable
                 /*失败后的retry配置*/
@@ -74,7 +76,7 @@ public class HttpManager {
                    /*回调线程*/
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext);
     }
-
+    @Keep
     public <T> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError) {
         httpObservable
                 /*失败后的retry配置*/
@@ -87,7 +89,7 @@ public class HttpManager {
                    /*回调线程*/
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(onNext, onError);
     }
-
+    @Keep
     public <T> void doHttp(LifecycleProvider<?> lifecycleProvider, Observable<T> httpObservable, Consumer<T> onNext, Consumer<Throwable> onError, Action onComplete) {
         httpObservable
                 /*结果判断*/

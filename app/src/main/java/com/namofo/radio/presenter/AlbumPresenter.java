@@ -1,5 +1,6 @@
 package com.namofo.radio.presenter;
 
+import android.support.annotation.Keep;
 import android.view.View;
 
 import com.namofo.radio.entity.Album;
@@ -41,7 +42,7 @@ public class AlbumPresenter extends BasePresenter<View> {
         requestList(page, onNext, onError);
     }
 
-    public void requestList(int album, Consumer<List<Album>> onNext, Consumer<String> onError) {
+    public void requestList(int page, Consumer<List<Album>> onNext, Consumer<String> onError) {
         submitRequest(getHttpService().getRecordAlbumList(), result -> {
             if (result.error) {
                 throw new HttpException(result.message);

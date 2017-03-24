@@ -32,6 +32,5 @@ public class EventFragment extends RxFragment {
 
     @Subscribe
     public void onEventMainThread() {
-
     }
 }

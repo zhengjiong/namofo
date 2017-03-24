@@ -1,5 +1,7 @@
 package com.namofo.radio.entity.api;
 
+import android.support.annotation.Keep;
+
 import java.util.List;
 
 /**

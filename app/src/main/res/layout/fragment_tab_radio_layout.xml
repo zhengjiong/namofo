@@ -7,21 +7,23 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar"/>
+
     <com.namofo.radio.view.RotatePlayView
         android:id="@+id/rotate_play_view"
         android:layout_width="match_parent"
         android:layout_height="350dp"/>
+
     <com.namofo.radio.view.playerview.MusicPlayerView
         android:id="@+id/music_player_view"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
+        android:visibility="gone"
         app:buttonColor="#ff0028"
         app:cover="@drawable/ic_empty_music2"
         app:progressLoadedColor="#00815e"
         app:textColor="#80FFFFFF"
-        android:visibility="gone"
         app:textSize="14sp"/>
 
     <LinearLayout
@@ -77,34 +79,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:text="@string/btn_stop"/>/
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/btn_test_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="start"/>
-
-        <Button
-            android:id="@+id/btn_test_pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="pause"/>
-
-        <Button
-            android:id="@+id/btn_test_resume"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="resume"/>
-
-        <Button
-            android:id="@+id/btn_test_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop"/>
     </LinearLayout>
 </LinearLayout>

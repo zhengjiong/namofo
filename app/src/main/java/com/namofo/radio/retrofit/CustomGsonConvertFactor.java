@@ -1,5 +1,7 @@
 package com.namofo.radio.retrofit;
 
+import android.support.annotation.Keep;
+
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;

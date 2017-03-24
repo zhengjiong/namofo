@@ -1,5 +1,7 @@
 package com.namofo.radio.presenter;
 
+import android.support.annotation.Keep;
+
 import com.namofo.radio.http.HttpManager;
 import com.namofo.radio.http.HttpService;
 import com.trello.rxlifecycle2.LifecycleProvider;
@@ -18,6 +20,7 @@ import io.reactivex.functions.Consumer;
  * @author 郑炯
  * @version 1.0
  */
+@Keep
 public abstract class BasePresenter<V> implements Presenter<V> {
     HttpManager httpManager = HttpManager.getInstance();
     LifecycleProvider<?> lifecycleProvider;

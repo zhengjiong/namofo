@@ -1,5 +1,7 @@
 package com.namofo.radio.http;
 
+import android.support.annotation.Keep;
+
 import com.namofo.radio.entity.Album;
 import com.namofo.radio.entity.Audio;
 import com.namofo.radio.entity.MeiZhi;
@@ -20,6 +22,7 @@ import retrofit2.http.Query;
  * @author 郑炯
  * @version 1.0
  */
+@Keep
 public interface HttpService {
     @GET("data/福利/10/{page}")
     Observable<BaseResultEntity<List<MeiZhi>>> getMeizhi(@Path("page") int page);
@@ -28,6 +31,7 @@ public interface HttpService {
      * 获取所有专辑列表
      * @return
      */
+    @Keep
     @GET("web.do?key=getAlbumList")
     Observable<BaseResultEntity<List<Album>>> getRecordAlbumList();
 

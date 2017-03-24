@@ -1,5 +1,7 @@
 package com.namofo.radio.entity;
 
+import android.support.annotation.Keep;
+
 /**
  * Title: Album
  * Description:

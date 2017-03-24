@@ -9,7 +9,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.namofo.radio.common.IntentKey;
+import com.namofo.radio.event.RadioPlayStatusEvent;
 import com.namofo.radio.util.LogUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Title: PlayerService
@@ -31,6 +35,9 @@ public class PlayerService extends Service {
     protected MediaNotificationUtils mMediaNotificationUtils;
 
     private boolean isForeGround;
+    private String mNotificationTitle;
+    private String mNotificationText;
+    private String mAudioDataSource;
 
     public class RadioBinder extends Binder {
         public PlayerService getService() {
@@ -71,8 +78,10 @@ public class PlayerService extends Service {
                 notifyRadioStop();
             } else if (AudioPlayer.AUDIO_PLAY_ACTION.equals(action)) {
                 //播放录音
-                String dataSource = intent.getStringExtra(AudioPlayer.EXTRA_NAME_AUDIO_DATA_SOURCE);
-                mAudioPlayer.play(dataSource);
+                mNotificationTitle = intent.getStringExtra(IntentKey.KEY_TITLE);
+                mNotificationText = intent.getStringExtra(IntentKey.KEY_TEXT);
+                mAudioDataSource = intent.getStringExtra(IntentKey.KEY_AUDIO_DATA_SOURCE);
+                mAudioPlayer.play(mAudioDataSource);
                 notifyAudioPlay();
             } else if (AudioPlayer.AUDIO_PAUSE_ACTION.equals(action)) {
                 //暂停录音
@@ -84,15 +93,16 @@ public class PlayerService extends Service {
                 mAudioPlayer.stop();
                 notifyAudioStop();
             } else if (RadioPlayer.RADIO_CLOSE_ACTION.equals(action)) {
+                EventBus.getDefault().post(new RadioPlayStatusEvent(RadioPlayStatusEvent.STOPED));
                 mRadioPlayer.release();
                 //if (!mAudioPlayer.isPlaying()) {
-                    stopForeground(false);
+                stopForeground(false);
                 //}
                 mNotificationManager.cancel(MediaNotificationUtils.NOTIFICATION_ID_RADIO);
             } else if (AudioPlayer.AUDIO_CLOSE_ACTION.equals(action)) {
                 mAudioPlayer.release();
                 //if (!mRadioPlayer.isPlaying()) {
-                    stopForeground(false);
+                stopForeground(false);
                 //}
                 mNotificationManager.cancel(MediaNotificationUtils.NOTIFICATION_ID_AUDIO);
             }
@@ -101,10 +111,10 @@ public class PlayerService extends Service {
         return Service.START_NOT_STICKY;//如果在执行完onStartCommand后，服务被异常kill掉，系统不会自动重启该服务。
     }
 
-    public void notifyRadioPlay(){
+    public void notifyRadioPlay() {
         if (mAudioPlayer.isPlaying()) {
             mAudioPlayer.pause();
-            mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(true));
+            mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(true, mNotificationTitle, mNotificationText, mAudioDataSource));
         }
         if (!isForeGround) {
             isForeGround = true;
@@ -114,29 +124,29 @@ public class PlayerService extends Service {
         }
     }
 
-    public void notifyRadioStop(){
+    public void notifyRadioStop() {
         isForeGround = false;
         stopForeground(false);
         mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(true));
     }
 
-    public void notifyAudioPlay(){
+    public void notifyAudioPlay() {
         if (mRadioPlayer.isPlaying()) {
             mRadioPlayer.stop();
             mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_RADIO, mMediaNotificationUtils.createRadioNotification(true));
         }
         if (!isForeGround) {
             isForeGround = true;
-            startForeground(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(false));
+            startForeground(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(false, mNotificationTitle, mNotificationText, mAudioDataSource));
         } else {
-            mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(false));
+            mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(false, mNotificationTitle, mNotificationText, mAudioDataSource));
         }
     }
 
-    public void notifyAudioStop(){
+    public void notifyAudioStop() {
         isForeGround = false;
         stopForeground(false);
-        mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(true));
+        mNotificationManager.notify(MediaNotificationUtils.NOTIFICATION_ID_AUDIO, mMediaNotificationUtils.createAudioNotification(true, mNotificationTitle, mNotificationText, mAudioDataSource));
     }
 
     @Override

@@ -36,10 +36,10 @@ import java.lang.annotation.RetentionPolicy;
  * @version 1.0
  */
 public class RadioPlayer {
-    public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
-    //public static final String RTMP = "http://26795.hlsplay.aodianyun.com/qingxinrensheng/stream.m3u8";
+//    public static final String RTMP = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
+//    public static final String RTMP = "http://26795.hlsplay.aodianyun.com/qingxinrensheng/stream.m3u8";
     //public static final String RTMP = "http://live.hkstv.hk.lxdns.com/live/hks/playlist.m3u8";
-//    public static final String RTMP = "rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583";
+    public static final String RTMP = "rtmp://26795.lssplay.aodianyun.com/qingxinrensheng/stream?k=ebe0c2da1df2626972ef08fd269cd6e2&t=1483501583";
     public PlayerService mService;
     private PLMediaPlayer mPLMediaPlayer;
     private AVOptions mAVOptions;

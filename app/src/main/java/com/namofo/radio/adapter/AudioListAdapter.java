@@ -1,6 +1,7 @@
 package com.namofo.radio.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import com.namofo.radio.R;
@@ -42,7 +43,7 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
     @Override
     public void onBindViewHolder(AudioItemViewHolder holder, int position) {
         Audio audio = getItem(position);
-        if (position == 0) {
+        /*if (position == 0) {
             audio.audio_url = "http://audio.xmcdn.com/group26/M05/4F/FC/wKgJRljPCIWhxAZsAEavze4CNGg780.m4a";
         } else if (position == 1) {
             audio.audio_url = "http://audio.xmcdn.com/group26/M04/72/06/wKgJRljSLbbyNhCsABDiLBsYrB8877.m4a";
@@ -52,7 +53,7 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
             audio.audio_url = "http://audio.xmcdn.com/group26/M09/40/E6/wKgJWFjNXojitlrpABPwktDPeiM430.m4a";
         } else if (position == 4) {
             audio.audio_url = "http://audio.xmcdn.com/group9/M0A/87/05/wKgDYldS66OhILGuAI7YXtdBSSk047.m4a";
-        }
+        }*/
         holder.tvNumber.setText(String.valueOf(position + 1));
         holder.title.setText(audio.audio_name);
         holder.tvDate.setText(audio.mdate);
@@ -60,7 +61,11 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
 
         holder.itemView.setOnClickListener(v -> {
             Audio playAudio = getItem(holder.getAdapterPosition());
-            EventBus.getDefault().post(new AudioPlayEvent(AudioPlayer.AUDIO_PLAY_ACTION, playAudio.audio_name, "讲师A",playAudio.audio_url));
+            if (TextUtils.isEmpty(playAudio.audio_url)) {
+                ToastUtils.showShort(mContext, "地址错误, 不能播放!");
+                return;
+            }
+            EventBus.getDefault().post(new AudioPlayEvent(AudioPlayer.AUDIO_PLAY_ACTION, playAudio.audio_name, playAudio.remark, playAudio.audio_url));
             ToastUtils.showShort(mContext, R.string.text_play_start);
         });
     }

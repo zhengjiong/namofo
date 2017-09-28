@@ -72,7 +72,7 @@ public class MediaNotificationUtils {
                 .setVisibility(android.support.v7.app.NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentIntent(clickIntent)
                 .setContentTitle("FM直播")
-                .setContentText("凤凰卫视")
+                .setContentText(mContext.getResources().getString(R.string.app_name))
                 .setWhen(System.currentTimeMillis())
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)//制定通知的分类
                 //.setCustomBigContentView()//指定展开时的视图

@@ -115,6 +115,8 @@ dependencies {
 
     compile 'com.chanven.lib:cptr:1.1.0' //https://github.com/Chanven/CommonPullToRefresh
 
+    compile 'com.tencent.bugly:crashreport:latest.release'
+
     //compile 'com.qiniu:happy-dns:0.2.+'//七牛云直播dns https://github.com/pili-engineering/PLDroidPlayer
 
     //# required, enough for most devices.

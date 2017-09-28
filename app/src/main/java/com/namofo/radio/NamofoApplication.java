@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.namofo.radio.db.GreenDaoManager;
 import com.namofo.radio.util.LogUtils;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * Title: NamofoApplication
@@ -21,6 +22,7 @@ public class NamofoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         GreenDaoManager.getInstance(this);
+        CrashReport.initCrashReport(getApplicationContext(), "6743ee4a27", false);
     }
 
 }

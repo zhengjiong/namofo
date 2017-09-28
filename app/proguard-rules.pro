@@ -128,3 +128,8 @@ public static java.lang.String TABLENAME;
 -dontwarn com.namofo.radio.entity.**
 -keep class com.namofo.radio.entity.**{*;}
 -keep public class * extends com.namofo.radio.entity.**
+
+
+#bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

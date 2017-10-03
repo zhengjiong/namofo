@@ -28,7 +28,7 @@ public class Audio {
     public int id;
     public String mdate;
     public String remark;
-    public int audio_second;
+    public String audio_second;
     public String audio_url;
     public float audio_size;
     public String audio_name;

@@ -29,7 +29,6 @@ import java.util.Date;
  * @version 1.0
  */
 public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecyclerViewAdapter<Audio, VH> {
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.HHMMSS);
 
     public AudioListAdapter(Context context) {
         super(context);
@@ -57,7 +56,7 @@ public class AudioListAdapter<VH extends AudioItemViewHolder> extends BaseRecycl
         holder.tvNumber.setText(String.valueOf(position + 1));
         holder.title.setText(audio.audio_name);
         holder.tvDate.setText(audio.mdate);
-        holder.tvTime.setText(simpleDateFormat.format(new Date(audio.audio_second)));
+        holder.tvTime.setText(audio.audio_second);
 
         holder.itemView.setOnClickListener(v -> {
             Audio playAudio = getItem(holder.getAdapterPosition());
